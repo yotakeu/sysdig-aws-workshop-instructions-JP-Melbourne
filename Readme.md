@@ -15,6 +15,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 1. ウェブブラウザを開き、https://aws.amazon.com/console/ にアクセスする。
 1. プロンプトが表示されたら、(Root ユーザーではなく) IAM ユーザーでサインインすることを選択し、**sysdig-sales-engineering** の AWS Account ID を入力します。
 1. 提供された IAM ユーザー名とパスワードを入力し、**Sign in** ボタンをクリックします。
+    1. ![](instruction-images/awslogin.png)
 1. コンソール右上のドロップダウンから **Sydney** リージョンを選択します。
     1. ![](instruction-images/region.png)
 1. EC2サービスのコンソールに移動する（上部の検索ボックスにEC2と入力し、結果のEC2サービスをクリックできる）。
