@@ -214,18 +214,18 @@ kubectl events security-playground -n security-playground-restricted** を実行
 なぜPodが起動しないのかと頭を悩ませるよりも、パイプラインのもっと早い段階で、あるいはもっと遅い段階で、このようなことが起こる（そしてPodSpecを修正する必要がある）ことを知らせるべきです。
 
 この表は、このワークロードを修正するための実験をまとめたものです：
-|example-curl.shのエクスプロイト|example-curl|security-playground|security-playground-restricted|security-playground-restricted + コンテナドリフトの強制|security-playground-restricted + マルウェアの強制|。
-
-|1|機密パス/etc/shadowの読み込み|許可|ブロック(rootで実行しない場合)|ブロック(rootで実行しない場合)|ブロック(rootで実行しない場合)
-|2|ファイルを/binに書き込み、それをchmod +x'して実行する|許可される|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|｜nmc/shadowをインストールする。
-3|aptからnmapをインストールしてネットワークスキャンを実行する|許可される|ブロックされる(rootとして実行しないことで)|ブロックされる(rootとして実行しないことで)|ブロックされる(rootとして実行しないことで)| |。
-|4|nsenterコマンドを実行し、コンテナLinuxの名前空間からホストに「抜け出す」|許可|ブロック（root権限で実行せず、hostPIDと特権的なsecurityContextを指定しない）|ブロック（root権限で実行せず、hostPIDと特権的なsecurityContextを指定しない）|ブロック（root権限で実行せず、hostPIDと特権的なsecurityContextを指定しない）|許可
-|5|ノードのコンテナランタイムに対して crictl コマンドを実行する|許可される|ブロックされる（root として実行せず、hostPID と特権 securityContext を指定しない）|ブロックされる（root として実行せず、hostPID と特権 securityContext を指定しない）|ブロックされる（root として実行せず、hostPID と特権 securityContext を指定しない）|ブロックされる
-|6|同じノード上の別のPodからKubernetesのシークレットを取得するためにcrictlコマンドを使用すること|許可|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる
-|7|機密データを流出させるために同じノード上の別の Pod 内で Postgres CLI の psql を実行するために crictl コマンドを使用すること|許可される|ブロックされる（root として実行されておらず、hostPID と特権的な securityContext を持たない）|ブロックされる（root として実行されておらず、hostPID と特権的な securityContext を持たない）|ブロックされる（root として実行されておらず、hostPID と特権的な securityContext を持たない）|ブロックされる
-|8|別の極悪なワークロードを起動するためにKubernetes CLI kubectlを使用する|許可|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|ブロックされる（ServiceAccountがオーバープロビジョニングされておらず、Container Drift Enforcementによってkubectlのインストールが妨げられているため）|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|ブロックされる。
-|9*|security-playgroundポッドからノードのAWS EC2 Instance Metadataエンドポイントに対してcurlコマンドを実行する。
-|10|xmrig暗号マイナーを実行する|許可|許可|ブロックされる（Container Drift Enforcementがxmrigのインストールをブロックする）|ブロックされる（Malware Enforcementがブロックする）。
+|Exploit in the example-curl.sh|example-curl|security-playground|security-playground-restricted|security-playground-restricted + container drift enforcement|security-playground-restricted + malware enforcement|
+|-|-|-|-|-|-|
+|1|Reading the sensitive path /etc/shadow|allowed|blocked (by not running as root)|blocked (by not running as root)|blocked (by not running as root)|
+|2|Writing a file to /bin then chmod +x'ing it and running it|allowed|blocked (by not running as root)|blocked (by not running as root)|blocked (by not running as root)|
+|3|Installing nmap from apt and then running a network scan|allowed|blocked (by not running as root)|blocked (by not running as root)|blocked (by not running as root)|
+|4|Running the nsenter command to 'break out' of our container Linux namespace to the host|allowed|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|
+|5|Running the crictl command against the container runtime for the Node|allowed|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|
+|6|Using the crictl command to grab a Kubernetes secret from another Pod on the same Node|allowed|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|
+|7|Using the crictl command to run the Postgres CLI psql within another Pod on the same Node to exfiltrate some sensitive data|allowed|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|blocked (by not running as root and no hostPID and no privileged securityContext)|
+|8|Using the Kubernetes CLI kubectl to launch another nefarious workload|allowed|blocked (by ServiceAccount not being overprovisioned)|blocked (by ServiceAccount not being overprovisioned and Container Drift Enforcement preventing kubectl being installed)|blocked (by ServiceAccount not being overprovisioned)|
+|9*|Running a curl command against the AWS EC2 Instance Metadata endpoint for the Node from the security-playground Pod|allowed|allowed|allowed|allowed|
+|10|Run the xmrig crypto miner|allowed|allowed|blocked (by Container Drift Enforcement blocking xmrig from being installed)|blocked (by Malware Enforcement)
 
 *そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックされる可能性がある。これは将来のNetworkPolicyモジュールで行う。
 
