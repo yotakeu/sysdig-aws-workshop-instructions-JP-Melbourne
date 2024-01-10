@@ -12,25 +12,25 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 
 ファシリテーターから IAM ユーザー名とパスワードを受け取っているでしょう。自分の環境にサインインするには
 
-1. ウェブブラウザを開き、https://aws.amazon.com/console/ にアクセスする。
-1. プロンプトが表示されたら、(Root ユーザーではなく) IAM ユーザーでサインインすることを選択し、**sysdig-sales-engineering** の AWS Account ID を入力します。
+1. ウェブブラウザを開き、https://sysdig-sales-engineering.signin.aws.amazon.com/console/ にアクセスします。
+1. プロンプトが表示されたら、AWS Account IDに **sysdig-sales-engineering** と入力されていることを確認します。
 1. 提供された IAM ユーザー名とパスワードを入力し、**Sign in** ボタンをクリックします。
     1. ![](instruction-images/awslogin.png)
 1. コンソール右上のドロップダウンから **Sydney** リージョンを選択します。
     1. ![](instruction-images/region.png)
-1. EC2サービスのコンソールに移動する（上部の検索ボックスにEC2と入力し、結果のEC2サービスをクリックできる）。
-1. Resources**の下にある**Instances (running)** リンクをクリックし、実行中のEC2インスタンスのリストに移動する。
+1. EC2サービスのコンソールに移動します（上部の検索ボックスにEC2と入力し、検索結果のEC2サービスをクリックできます）。
+1. Resourcesの下にある **Instances (running)** リンクをクリックし、実行中のEC2インスタンスのリストに移動します。
     1. ![](instruction-images/instances1.png)
-1. Find instance by attribute or tag** search boxに**AttendeeXX**（XXはユーザー名の末尾の出席者番号）と入力し、Enter/Returnを押す。
+1. **Find instance by attribute or tag** 検索ボックスに**AttendeeXX**（XXはユーザー名の末尾の出席者番号）と入力し、エンター/リターンを押します。
 1. ジャンプボックスの隣にあるボックスにチェックを入れ、上部の**Connect**ボタンをクリックします。
     1. ![](instruction-images/instances2.png)
-1. セッションマネージャー**タブを選択し、**接続**ボタンをクリックします。
+1. **Session Manager**タブを選択し、**Connect**ボタンをクリックします。
     1.![](インストラクション画像/connect.png)
-1. ターミナルウィンドウが開いたら、**sudo bash** と入力し、**cd ~** と入力します。
-    1. **注意:** セッションマネージャーセッション/ターミナルウィンドウを閉じて再度開くと、ルートユーザーとそのホームディレク トリに戻るために、これら2つのコマンドを再実行する必要があります。
-1. kubectl get pods -A**と入力すると、EKSクラスタ内の実行中のPodの一覧が表示されます。
+1. ターミナルウィンドウが開いたら、`sudo bash` と入力してから、`cd /root` と入力します。
+    1. **注意:** セッションマネージャーセッション/ターミナルウィンドウを閉じて再度開くと、rootユーザーとそのホームディレクトリに戻るために、これら2つのコマンドを再度実行する必要があります。
+1. `kubectl get pods -A`と入力すると、EKSクラスタ内の実行中のPodの一覧が表示されます。
 
-> 注***： 注意**: ワークショップを通してGitHub上のサンプルファイルをいくつか紹介しますが、実行に必要なものはすべて/rootのjumpboxにあらかじめインストールされています。GitHubから何かをコピー＆ペーストしたり、**git clone**したりする必要はありません。
+> **注意**: ワークショップを通してGitHub上のサンプルファイルをいくつか紹介しますが、実行に必要なものはすべてジャンプボックスの/rootにあらかじめインストールされています。GitHubから何かをコピー＆ペーストしたり、**git clone**したりする必要はありません。
 
 ### Sysdig環境
 
