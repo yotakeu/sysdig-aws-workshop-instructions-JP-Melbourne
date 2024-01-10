@@ -45,17 +45,18 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 
 最初のモジュールでは、ランタイム脅威の検知と防御に関する Sysdig の機能について説明します。
 
-攻撃者がどのように侵入してくるかにかかわらず、攻撃者は多くの同じことを行います。予測可能な一連のことは、[MITRE ATT&CK Framework](https://attack.mitre.org/)によって最もよく説明されています。Sysdigの脅威リサーチチームは、世界中に大規模なハニーポットを設置し、攻撃者が侵入後にどのような行動を取るかを直接学んでいます。そして、すべてのお客様に代わって、[Rules](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-rules/) (何を探すべきか)と[Managed Policies](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/) (見つけたときに何をすべきか)のライブラリを継続的に更新しています。また、ご希望であれば、弊社が提供するものを超えて、お客様独自のカスタム（ファルコ）ルールおよび/またはポリシーを作成することも可能です - これは完全に透過的であり、魔法のブラックボックスではなく、オープンソースのツール/標準に基づいています！
+攻撃者がどのように侵入してくるかにかかわらず、攻撃者の行動は多くの点で共通しています。予測可能な一連の行動は、[MITRE ATT&CK Framework](https://attack.mitre.org/)によって詳細に説明されています。Sysdigの脅威リサーチチームは、世界中に大規模なハニーポットを設置し、攻撃者が侵入後にどのような行動を取るかを直接学んでいます。そして、すべてのお客様に代わって、[Rules](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-rules/) (何を検知べきか)と[Managed Policies](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/) (見つけたときに何をすべきか)のライブラリを継続的に更新しています。また、ご希望であれば、弊社が提供するものを超えて、お客様独自のカスタム（Falco）ルールおよび(
+または)ポリシーを作成することも可能です - これは完全に透過的であり、魔法のブラックボックスではなく、オープンソースのツール/標準に基づいています！
 
-当社のエージェントは、(お客様の**ポリシー**で定義された)様々な活動のストリームに対して、継続的に**ルール**を監視し、**イベント**を見つけたときに、関連するすべてのコンテキストとともにリアルタイムで発火させます。GitHub、Oktaなど）他の一般的なクラウド/SaaSサービスなど、近日中にさらに追加される予定です：
+当社のエージェントは、お客様の**ポリシー**で定義された様々な活動に対して、継続的に**ルール**と照らし合わせ、**イベント**を見つけたときに関連するすべてのコンテキストとともにリアルタイムでトリガーします。監視対象として下記以外にも、他の一般的なクラウド/SaaSサービスなどが近日中にさらに追加される予定です（GitHub、Oktaなど）：
 * ノード/コンテナのLinuxカーネルシステムコール
 * Kubernetesの監査証跡
 * AWS、Azure、GCPの監査証跡
 
-伝統的な "ルール/ポリシー "ベースのアプローチに加え、脅威検出/防止機能を強化する3つの機能があります：
-* コンテナ・ドリフト](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/drift-control/) - 実行時にコンテナ・イメージに含まれていない実行可能ファイルを検索し、オプションでその実行をブロックすることができます。
-* 暗号マイニングML検出](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/machine-learning/) - 暗号マイニングの検出に特化したモデルで、機械学習に対応した最初の検出を導入しました。
-* マルウェア（プレビュー） - 実行しようとするマルウェア（私たちがウォッチしているいくつかの脅威フィードで定義されている）を探すことができます。
+伝統的な "ルール/ポリシー "ベースのアプローチに加え、脅威検知/防止機能を強化する3つの機能があります：
+* [コンテナ・ドリフト](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/drift-control/) - 実行時にコンテナ・イメージに含まれていない実行可能ファイルを検索し、オプションでその実行をブロックすることができます。
+* [クリプトマイニングML検出](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/machine-learning/) - クリプトマイニングの検出に特化した機械学習モデルを採用しました。
+* マルウェア（プレビュー） - 実行しようとするマルウェア（私たちがウォッチしているいくつかの脅威フィードで定義されている）を検知することができます。
 
 ### Sysdig 内でイベントを生成するための攻撃のシミュレーション
 
