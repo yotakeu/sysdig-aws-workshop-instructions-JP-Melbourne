@@ -130,32 +130,32 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 
 ### この攻撃はなぜ成功したのでしょうか? 
 
-この攻撃が成功するためには、多くのことが当てはまらなければならなかった：
+この攻撃が成功するためには、多くの条件が当てはまらなければなりません：
 1. 私たちのサービスがリモートでコードを実行される脆弱性があること。これは、私たち自身のコードが脆弱であること（今回のケースのように）、あるいは私たちのアプリが使用しているオープンソースパッケージ（pip、npm、maven、nugetなど）が脆弱であることのいずれかによる可能性があります。
-1. 私たちが **curl** していたサービスは、**root** として実行されていました - そのため、コンテナのファイルシステム内のすべてを読み書きできるだけでなく、コンテナからホストにエスケープするときも root でした！
-1. PodSpecは[**hostPID: true**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L47)と[privrivileged **securityContext**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L64)を持っていたため、コンテナ境界(実行中のLinuxネームスペース)からホストにエスケープすることができた。
-1. 攻撃者は、実行時に**nmap**や暗号マイナーの**xmrig**のような新しい実行可能ファイルをコンテナに追加して実行することができた。
-1. 攻撃者はインターネットからこれらのものをダウンロードすることができた（このPodはそのイグレスを介してインターネット上のあらゆる場所に到達することができたため）。
-1. 私たちのサービスの ServiceAccount は過剰にプロビジョニングされており、K8s API を呼び出して他のワークロードを起動することができた（これは必要ない）。
-    1. kubectl get rolebindings -o yaml -n security-playground && kubectl get roles -o yaml -n security-playground** を実行して、デフォルトの ServiceAccount に以下のルール/パーミッションでバインドされた Role があることを確認します：
+1. 私たちが **curl** でアクセスしていたサービスは、**root** として実行されていました - そのため、コンテナのファイルシステム内のすべてを読み書きできるだけでなく、コンテナからホストにエスケープするときも root でした！
+1. PodSpecは[**hostPID: true**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L47)と[privrivileged **securityContext**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L64)を持っていたため、コンテナ境界(実行中のLinuxネームスペース)からホストにエスケープすることができました。
+1. 攻撃者は、実行時に**nmap**や暗号マイナーの**xmrig**のような新しい実行可能ファイルをコンテナに追加して実行することができました。
+1. 攻撃者はインターネットからこれらのものをダウンロードすることができました（このPodはそのEgressを介してインターネット上のあらゆる場所に到達することができたため）。
+1. 私たちのサービスの ServiceAccount は過剰にプロビジョニングされており、K8s API を呼び出して他のワークロードを起動することができました（本来これは必要ありません）。
+    1. `kubectl get rolebindings -o yaml -n security-playground && kubectl get roles -o yaml -n security-playground` を実行して、デフォルトの ServiceAccount に以下のルール/パーミッションでバインドされた Role があることを確認します：
         ```
-        ルール
-        - apiGroups：
+        rules:
+        - apiGroups:
             - '*'
-            resources：
+            resources:
             - '*'
-            動詞
+            verbs:
             - '*'
         ```
-    1. 少なくともそれはClusterRoleではなくRoleでした - つまりこのNamespaceでしかできないことがあるということです。しかし、Namespaceの中で完全な管理者としてできるダメージはたくさんあります！
-1. 攻撃者はPod内から、EKSノードだけを対象としたEC2メタデータのエンドポイント（169.254.0.0/16）に到達できた。
+    1. 上記はClusterRoleではなくRoleでした - つまり、できることはこのNamespace内に限られるということです。しかし、Namespaceの中で完全な管理者として与えられるダメージはたくさんあります！
+1. 攻撃者はPod内から、EKSノードだけを対象としたEC2メタデータのエンドポイント（169.254.0.0/16）に到達できました。
 
-これらはすべて修正できる：
-* ワークロードの設定方法（Kubernetesが新しい[Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/)で強制できるようになりました。）
-* Sysdig SecureのContainer Drift防止機能によるものもある。
-* そして残りは、インターネットへのイグレス・ネットワーク・アクセスを制御する。
+これらはすべて修正できます：
+* ワークロードの設定方法（Kubernetesの新しい[Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/)で強制できるようになりました。）
+* Sysdig SecureのContainer Drift防止機能を利用できます。
+* そして残りは、インターネットへのEgressネットワーク・アクセスを制御します。
 
-そして、この 3 つをすべて実行すれば、（単に攻撃を検知するだけでなく）攻撃全体を防ぐことができる！
+そして、この3つをすべて実行すれば、（単に攻撃を検知するだけでなく）攻撃全体を防ぐことができます！
 
 ### このワークロードを修正する方法（security-playground）
 
