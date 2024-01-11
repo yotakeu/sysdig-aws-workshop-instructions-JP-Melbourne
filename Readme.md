@@ -87,7 +87,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
         1. ![](instruction-images/insights2.png)
     1. 右側の**Events**タブを選択します。
     1. ご覧のように、Sysdigがリアルタイムで検知したイベントが多数あります！
-        1.[](instruction-images/insights3.png)
+        1. ![](instruction-images/insights3.png)
     1. **Detect outbound connections to common miner pools**イベントをクリックしてからスクロールすると、プロセス、ネットワーク、AWSアカウント、Kubernetesクラスタ/ネームスペース/デプロイメント、ホスト、コンテナの詳細を含む、そのイベントのすべてのコンテキストを確認することができます。
        1. 特にプロセスツリービューを見ると、Pythonアプリ(gunicorn)が暗号マイナーのxmrigを起動するシェルを起動していることがわかります！
        1. ![](instruction-images/processtree.png)
