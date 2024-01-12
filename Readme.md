@@ -151,7 +151,7 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 1. 攻撃者はPod内から、EKSノードだけを対象としたEC2メタデータのエンドポイント（169.254.0.0/16）に到達できました。
 
 これらはすべて修正できます：
-* ワークロードの設定方法（Kubernetesの新しい[Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/)で強制できるようになりました。）
+* ワークロードの設定（Kubernetesの新しい[Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/)で設定を強制できるようになりました。）
 * Sysdig SecureのContainer Drift防止機能を利用できます。
 * そして残りは、インターネットへのEgressネットワーク・アクセスを制御します。
 
