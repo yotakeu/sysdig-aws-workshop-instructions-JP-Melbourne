@@ -180,40 +180,40 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 1. 上記のようにNetworkPolicyでPodの169.254.0.0/16へのEgressアクセスをブロックするか、AWSのドキュメントに記載されているようにIDMSv2で最大1ホップに制限するか、どちらかです - https://docs.aws.amazon.com/whitepapers/latest/security-practices-multi-tenant-saas-applications-eks/restrict-the-use-of-host-networking-and-block-access-to-instance-metadata-service.html
 
 ### 実際に修正する
-私たちは、**なぜこの攻撃が機能したのか**の1-3が修正されたワークロードの例 - **security-playground-unprivileged**も実行しています。これは新しいnon-root Dockerfileで構築され、PSAが制限されたセキュリティ標準を強制するsecurity-playground-restricted Namespaceで実行されています（つまり、rootとして実行したり、コンテナのエスケープを許可するhostPIDや特権SecurityContextなどのオプションを持つことはできません）。kubectl describe namespace security-playground-restricted** - **pod-security**ラベルに注目してください。
+私たちは、**なぜこの攻撃が機能したのか**の1から3が修正されたワークロードの例として **security-playground-restricted** も実行しています。このワークロードは新しいnon-root Dockerfileで構築され、PSAがrestrictedのセキュリティ標準を強制するsecurity-playground-restrictedネームスペースで実行されています（つまり、rootとして実行したり、コンテナのエスケープを可能にするhostPIDや特権SecurityContextなどのオプションを持つことはできません）。`kubectl describe namespace security-playground-restricted` コマンドを実行してPSAを実現するラベルを確認しましょう（**pod-security**ラベルに注目してください）。
 
-オリジナルのKubernetes PodSpec [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L46) と、制限付きPSAをパスするために必要なすべての変更を加えたアップデート版 [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground-restricted.yaml#L26) を見ることができます。
+オリジナルのKubernetes PodSpec [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L46) と、restrictedのPSAをパスするために必要なすべての変更を加えたアップデート版 [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground-restricted.yaml#L26) を確認することができます。
 
-1-3が修正された状態で、私たちの攻撃がどうなるかを見るには、**./example-curls-restricted.sh**を実行してください（security-playground-restrictedの異なるポート/サービスを指すだけで、前回のファイルと同じです）。注意してほしい：
-* コンテナ内で root を必要とするもの（/etc/shadow の読み込み、/bin への書き込み、apt からのパッケージのインストールなど）は、Python アプリがそれを実行する権限を持っていないため、**500 Internal Server Error** で失敗します。
-* root**と**hostPid**と**privileged**がないと、コンテナをエスケープできませんでした。
-* 唯一うまくいったのは、ノードのEC2メタデータエンドポイントを叩くことと、xmrig crypto minerをユーザーのホームディレクトリにダウンロード/実行することだった。
+1から3が修正された状態で、私たちの攻撃がどうなるかを確認するには、`./example-curls-restricted.sh`を実行してください（前回とは異なるsecurity-playground-restrictedのポート/サービスを宛先とするだけで、内容は前回のファイルと同じです）。以下の点に注目してください：
+* コンテナ内でroot権限を必要とするもの（/etc/shadowの読み込み、/binへの書き込み、aptからのパッケージのインストールなど）は、Pythonアプリがそれを実行する権限を持っていないため、**500 Internal Server Error** で失敗します。
+* **root**と**hostPid**と**privileged**がないと、コンテナをエスケープできませんでした。
+* 唯一うまくいったのは、ノードのEC2メタデータエンドポイントを叩くことと、xmrig crypto minerをユーザーのホームディレクトリにダウンロード/実行することでした。
 
-また、SysdigでContainer Driftの防止（実行時に追加された新しい実行可能ファイルを実行できないようにする）を追加すると、EC2インスタンスのメタデータへのアクセス（将来のモジュールでNetworkPoliciesでブロックする）以外はすべてブロックされる。これを確認するには 
-* security-playground-restricted-nodrift**を見る - (他のNamespaceのように)ドリフトを検出するのではなく、ワークロードが**security-playground-restricted-nodrift** Namespaceにある場合にブロックしていることに注意。
-    * そして、別のHostPortでsecurity-playground-restrictedサービスの別のコピーを実行させています。
-* *./example-curls-restricted-nodrift.sh** を実行し、同じカールを実行しますが、前回の例のように制限されているワークロードに対して実行します。
-    1. Insights UI で結果のイベントを見ると、今回は Drift が検出されただけでなく、**防止**されたことがわかります。
+また、SysdigでContainer Driftの防止（コンテナ稼働時に追加された新しい実行可能ファイルを実行できないようにする）を追加すると、EC2インスタンスのメタデータへのアクセス（この後のラボでNetworkPoliciesでブロックする）以外はすべてブロックされます。この設定を確認するには：
+* **Policies -> Runtime Policies** に移動し、**security-playground-restricted-nodrift**ポリシーを確認します - (他のネームスペースのように)ドリフトを検知するだけではなく、ワークロードが**security-playground-restricted-nodrift**ネームスペースにある場合には**ブロック**することに注目してください。
+* `./example-curls-restricted-nodrift.sh` を実行します。同じcurlを実行しますが、直前の例のように制限されているワークロードに対して実行し、かつContainer Driftの防止（検知だけでなく）が有効になっています。
+    1. Insights UI で結果のイベントを見ると、今回は Drift が検知されただけでなく、**防止**されたことがわかります。
     1. ![](instruction-images/driftprevented.png)
 
-また、マルウェアを検出するだけでなく、ブロックすることもできるようになりました。
-それを見るには 
-* Policies**→**Runtime Policies**に移動し、**security-playground-restricted-nomalware**を見てください - （他のNamespaceのように）単にマルウェアを検出するのではなく、ワークロードが**security-playground-restricted-nomalware** Namespaceにある場合はブロックしていることに注意してください。
-    security-playground-restricted-nomalware**Namespaceにワークロードがある場合にブロックしています。
-* ./example-curls-restricted-nomalware.sh**を実行し、同じcurlsを実行しますが、Sysdigが（マルウェアを検知するだけでなく）マルウェアを防止しています（ただし、Container Driftはブロックしていません。）
-    1. Insights UI で結果のイベントを見ると、マルウェアが今回検出されただけでなく、**実行を阻止**されたことがわかります。
+また、マルウェアを検知するだけでなく、ブロックすることもできるようになりました。
+それを確認するには：
+* **Policies > Runtime Policies**に移動し、**security-playground-restricted-nomalware**ポリシーを確認してください - （他のNamespaceのように）単にマルウェアを検知するだけではなく、ワークロードが**security-playground-restricted-nomalware**ネームスペースにある場合は**ブロック**していることに注目してください。
+* `./example-curls-restricted-nomalware.sh`を実行します。同じcurlを実行しますが、Sysdigがマルウェアを検知するだけでなくマルウェアを防止しています。ただし、Container Driftはブロックしていません。
+    1. Insights UI で結果のイベントを見ると、マルウェアが今回検知されただけでなく、**実行を阻止**されたことがわかります。
     1. ![](instruction-images/malware.png)
 
-このように、SysdigのContainer Driftとマルウェア検出だけでなく、ワークロードの姿勢を修正することを組み合わせることで、多くの一般的な攻撃を防ぐことができます！
+このように、SysdigのContainer Driftとマルウェア検知だけでなく、ワークロードのポスチャーの修正を組み合わせることで、多くの一般的な攻撃を防ぐことができます！
 
-最後に、security-playground-restricted を変更して、security-playground のようにセキュリティを弱体化させるテストをしてみましょう。以下のコマンドを実行して、安全でないコンテナイメージとPodSpecをそのネームスペースにデプロイしてみてください **kubectl apply -f security-playground-test.yaml**。security-playground-restricted**名前空間ではPSAが制限されているため許可されないと警告されていることに注意してください。DeploymentにPodを作成させても、そのDeployment（実際にはそのReplicaSet）は実際にPodを起動できないことに注意してください。
+最後に、security-playground-restricted を変更して、security-playground のようにセキュリティを弱体化させるテストをしてみましょう。以下のコマンドを実行して、安全でないコンテナイメージとPodSpecをそのネームスペースにデプロイしてみてください。
+`kubectl apply -f security-playground-test.yaml`
+**security-playground-restricted**ネームスペースではPSAで制限されているため許可されないと警告されていることに注目してください。DeploymentにPodを作成させても、そのDeployment（実際にはそのReplicaSet）は実際にPodを起動できないことに注目してください。
 ![](instruction-images/psa.png)
 
-kubectl events security-playground -n security-playground-restricted** を実行すると、Pod作成の失敗を確認できます。
+`kubectl events security-playground -n security-playground-restricted` を実行すると、Pod作成の失敗を確認できます。
 
-なぜPodが起動しないのかと頭を悩ませるよりも、パイプラインのもっと早い段階で、あるいはもっと遅い段階で、このようなことが起こる（そしてPodSpecを修正する必要がある）ことを知らせるべきです。
+なぜPodが起動しないのかと頭を悩ませるよりも、パイプラインのもっと早い段階で、実行時にこのようなことが起こる（そしてPodSpecを修正する必要がある）ことを知らせるべきです。
 
-この表は、このワークロードを修正するための実験をまとめたものです：
+この表は、このワークロードを修正するためのテストをまとめたものです：
 |Exploit in the example-curl.sh|example-curl|security-playground|security-playground-restricted|security-playground-restricted + container drift enforcement|security-playground-restricted + malware enforcement|
 |-|-|-|-|-|-|
 |1|Reading the sensitive path /etc/shadow|allowed|blocked (by not running as root)|blocked (by not running as root)|blocked (by not running as root)|
@@ -227,7 +227,7 @@ kubectl events security-playground -n security-playground-restricted** を実行
 |9*|Running a curl command against the AWS EC2 Instance Metadata endpoint for the Node from the security-playground Pod|allowed|allowed|allowed|allowed|
 |10|Run the xmrig crypto miner|allowed|allowed|blocked (by Container Drift Enforcement blocking xmrig from being installed)|blocked (by Malware Enforcement)
 
-*そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックされる可能性がある。これは将来のNetworkPolicyモジュールで行う。
+*そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックできる可能性があります。これはこの後のNetworkPolicyのラボで実施します。
 
 ## モジュール 2 - ランタイム脅威の検知と防御（クラウド/AWS）
 
