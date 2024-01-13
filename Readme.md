@@ -208,9 +208,10 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 
 `kubectl apply -f security-playground-test.yaml`
 
-**security-playground-restricted**ネームスペースではPSAで制限されているため許可されないと警告されていることに注目してください。DeploymentにPodを作成させても、そのDeployment（実際にはそのReplicaSet）は実際にPodを起動できないことに注目してください。
+**security-playground-restricted**ネームスペースではPSAで制限されているため許可されないと警告されていることに注目してください。
 ![](instruction-images/psa.png)
 
+また、上記コマンドでDeploymentにPodを作成させていますが、そのDeployment（実際にはそのReplicaSet）はPodを起動できません。
 `kubectl events security-playground -n security-playground-restricted` を実行すると、Pod作成の失敗を確認できます。
 
 なぜPodが起動しないのかと頭を悩ませるよりも、パイプラインのもっと早い段階で、実行時にこのようなことが起こる（そしてPodSpecを修正する必要がある）ことを知らせるべきです。
