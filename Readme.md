@@ -163,21 +163,21 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 1. このケースで脆弱性を修正するには、静的アプリケーション・セキュリティ・テスト（SAST）製品を使って、安全でない コードを特定します。私たちのパートナーである[Snyk](https://snyk.io/product/snyk-code/)は、ここでは良い選択です。
     1. ![](instruction-images/Snyk-SAST.png)
     1. 代わりに、これがアプリ/コンテナ内の既知/公開の CVE（Log4Jなど）に基づくものであれば、Sysdigの脆弱性管理（今後のモジュールで取り上げます）がこれを検出し、コンテナのベースレイヤーまたはコードパッケージのいずれかに、脆弱性のない更新バージョンへのパッチを適用するよう知らせてくれるでしょう。
-1. このコンテナをnon-rootで実行するには、実際には以下の方法でDockerfileを変更する必要がある。これが変更前の[Dockerfile](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile)で、これが変更後の[Dockerfile](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile-unprivileged)である。
+1. このコンテナをnon-rootで実行するには、実際には以下の方法でDockerfileを変更する必要があります。これが変更前の[Dockerfile](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile)で、これが変更後の[Dockerfile](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile-unprivileged)です。
     1. docker build の一部として、[使用するユーザとグループを追加する](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile-unprivileged#L3) 必要があります。
-    1. Dockerfileに、デフォルトでそのユーザとして実行するよう指定する](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile-unprivileged#L8) 必要があります（これはあくまでデフォルトであり、実行時に上書きすることができます。
-    1. ユーザー/グループが読み取りと実行（そしておそらく書き込みも）のパーミッションを持つフォルダにアプリを置く必要があります - [この場合、元の/appではなく、新しいユーザーのホームディレクトリを使用します](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile-unprivileged#L9)
-    1. 最近のKubeCon Europeでは、最小特権コンテナの構築に関する素晴らしい講演があり、ここではさらに深く掘り下げています - https://youtu.be/uouH9fsWVIE
-1. PodSpecから安全でないオプションを削除するだけです。しかし、理想的には、このようなオプションをPodSpecに入れられないようにする必要もあります。
-    1. Kubernetesに組み込まれた機能(1.25でGAされた)で、そうしないように強制することができます - [Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/).
-        1. これは[各Namespaceにラベルを追加する](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)ことで機能する。ベースラインと制限の2つの基準について警告したり、強制したりすることができる。
-            1. [ベースライン](https://kubernetes.io/docs/concepts/security/pod-security-standards/#baseline) - HostPidやPrivilegedなど、PodSpecの最悪のパラメータは使用できませんが、コンテナをrootとして実行することはできます。
-            1. [restricted](https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted) - これはさらに進んで、非 root での実行を含むすべての安全でないオプションをブロックする。
-    1. また、Sysdig には Posture/Compliance 機能があり、デプロイ前に IaC を検知したり、実行時に問題を修正したりすることができる。
-1. コンテナ・ドリフト（Container Drift）の実行時に追加される新しいスクリプト/バイナリの実行をブロックすることができる（このケースでは、ドリフトを防止するのではなく、検知するだけである）。
-1. KubernetesのNetworkPolicy（今後のモジュールで取り上げます）か、各サービスが到達可能なものの許可リストを使用して、インターネットに到達するために明示的に認証されたプロキシを経由させることによって、インターネットへのPod（複数可）のイグレスアクセスを制限することができます。
-1. Kubernetes APIへの不要なアクセスを許可するデフォルトのServiceAccountによって、Kubernetes APIへのRoleとRoleBindingを削除することができます。
-1. 上記のようにNetworkPolicyでPodの169.254.0.0/16へのegressアクセスをブロックするか、AWSのドキュメントに記載されているようにIDMSv2で最大1ホップを確保するか、どちらかです - https://docs.aws.amazon.com/whitepapers/latest/security-practices-multi-tenant-saas-applications-eks/restrict-the-use-of-host-networking-and-block-access-to-instance-metadata-service.html
+    1. Dockerfileに、[デフォルトでそのユーザとして実行するよう指定する](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile-unprivileged#L8) 必要があります（これはあくまでデフォルトであり、実行時に上書きすることができます - restricted PSAやアドミッションコントローラがブロックしなければ）。
+    1. ユーザー/グループが読み取りと実行（そしておそらく書き込みも）のパーミッションを持つフォルダにアプリを置く必要があります - この場合、元の/appではなく、[新しいユーザーのホームディレクトリを使用します](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/Dockerfile-unprivileged#L9)
+    1. 最近のKubeCon Europeでは、最小特権コンテナの構築に関する素晴らしい講演があり、さらに深い内容を学ぶことができます。 - https://youtu.be/uouH9fsWVIE
+1. PodSpecから安全でないオプションを削除します。しかし、理想的には、このようなオプションをPodSpecに入れられないようにする必要があります。
+    1. Kubernetesに組み込まれた機能(1.25でGAになった)で、PodSpecに入れられないように強制することができます - [Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/).
+        1. これは[各Namespaceにラベルを追加する](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)ことで機能します。baselineとrestrictedの2つの基準を使って、警告したり強制したりすることができます。
+            1. [baseline](https://kubernetes.io/docs/concepts/security/pod-security-standards/#baseline) - HostPidやPrivilegedなど、PodSpecの最悪のパラメータは使用できませんが、コンテナをrootとして実行することはできます。
+            1. [restricted](https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted) - 非rootでの実行を含む、すべての安全でないオプションをブロックします。
+    1. また、Sysdig には Posture/Compliance 機能があり、デプロイ前に IaC をスキャンしたり、実行時に問題を修正したりすることができます。
+1. コンテナ・ドリフト（Container Drift）で、実行時に追加される新しいスクリプト/バイナリの実行をブロックすることができます（今回はドリフトを防止するのではなく、検知するだけです）。
+1. KubernetesのNetworkPolicy（今後のモジュールで取り上げます）か、各サービスが到達可能な宛先の許可リストを使用して、インターネットに到達するために明示的に認証されたプロキシを経由させることによって、インターネットへのPod（複数可）のEgressアクセスを制限することができます。
+1. Kubernetes APIへの不要なアクセスを許可するデフォルトのServiceAccountによる、Kubernetes APIへのRoleとRoleBindingを削除することができます。
+1. 上記のようにNetworkPolicyでPodの169.254.0.0/16へのEgressアクセスをブロックするか、AWSのドキュメントに記載されているようにIDMSv2で最大1ホップに制限するか、どちらかです - https://docs.aws.amazon.com/whitepapers/latest/security-practices-multi-tenant-saas-applications-eks/restrict-the-use-of-host-networking-and-block-access-to-instance-metadata-service.html
 
 ### 実際に修正する
 私たちは、**なぜこの攻撃が機能したのか**の1-3が修正されたワークロードの例 - **security-playground-unprivileged**も実行しています。これは新しいnon-root Dockerfileで構築され、PSAが制限されたセキュリティ標準を強制するsecurity-playground-restricted Namespaceで実行されています（つまり、rootとして実行したり、コンテナのエスケープを許可するhostPIDや特権SecurityContextなどのオプションを持つことはできません）。kubectl describe namespace security-playground-restricted** - **pod-security**ラベルに注目してください。
