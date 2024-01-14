@@ -309,10 +309,10 @@ AWS API側では下記イベントで、バケットが公開されることに�
 ### この攻撃を防ぐ方法/このワークロードを修正する方法
 
 このIRSAの例は、以下の方法で防ぐことができます：
-* IRSAのポリシーで、パブリックブロックの削除を許可したりバケットポリシー（ファイルなどの読み書き）を適用できてしまう s3* を使用するのではなく、よりきめ細かく最小特権を設定する。
+* IRSAのポリシーで、パブリックブロックの削除を許可したりバケットポリシー（ファイルなどの読み書き）を適用できてしまう s3* を使用するのではなく、よりきめ細かく最小特権を設定します。
     * [Permissions Boundary](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html) や [Service Control Policies (SCPs)](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html) のようなものも、このような過剰な権限を持つロールが作成されないようにするために役立ちます。
     * ![](https://docs.aws.amazon.com/images/IAM/latest/UserGuide/images/EffectivePermissions-scp-boundary-id.png)
-* SysdigでContainer Driftを強制し、AWS CLIが実行時にダウンロード/実行できないようにする（イメージに含まれていないことも確認する）。
+* SysdigでContainer Driftポリシーを使用し、AWS CLIを実行できないようにします（イメージに含まれていないことも確認します）。
 
 今回の例ではどちらを使っても防ぐことができますが、両方とも実施するのが理想的です。
 
