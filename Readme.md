@@ -230,22 +230,22 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 |9*|Running a curl command against the AWS EC2 Instance Metadata endpoint for the Node from the security-playground Pod|allowed|allowed|allowed|allowed|
 |10|Run the xmrig crypto miner|allowed|allowed|blocked (by Container Drift Enforcement blocking xmrig from being installed)|blocked (by Malware Enforcement)
 
-*そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックできる可能性があります。これはこの後のNetworkPolicyのラボで実施します。
+*そして9は、NetworkPolicy　や　IDMSv2　の　1　ホップへの制限によってブロックできる可能性があります。これはこの後の　NetworkPolicy　のラボで実施します。
 
 ## モジュール 2 - ランタイム脅威の検知と防御（クラウド/AWS）
 
-Sysdigのランタイム脅威検知は、LinuxカーネルのシステムコールとKubernetesの監査証跡に限定されません - AWSのCloudTrail（同様にAzure、GCP、Okta、GitHubなど）に対してエージェントレスでランタイム脅威を検知することもできます！エージェントレスというのは、CloudTrailを監視するFalcoがSysdigのSaaSバックエンドで実行されることを意味します。オプションとして[Cloud Connector](https://docs.sysdig.com/en/docs/installation/sysdig-secure/connect-cloud-accounts/aws/agent-based-with-ciem/)と呼ばれるお客様のアカウントでエージェントを実行することも可能ですが、ほとんどのお客様はSysdigがサービスとしてSaaS側で行うことを好まれます。
+Sysdig　のランタイム脅威検知は、Linux　カーネルのシステムコールと　Kubernetes　の監査証跡に限定されません。AWS　の　CloudTrail（同様に　Azure、GCP、Okta、GitHub　など）に対してエージェントレスでランタイム脅威を検知することもできます！エージェントレスというのは、CloudTrail　を監視する　Falco　が　Sysdig　の　SaaS　バックエンドで実行されることを意味します。オプションとして[Cloud Connector](https://docs.sysdig.com/en/docs/installation/sysdig-secure/connect-cloud-accounts/aws/agent-based-with-ciem/)と呼ばれるお客様のアカウントでエージェントを実行することも可能ですが、ほとんどのお客様は　Sysdig　がサービスとして　SaaS　側で行うことを好まれます。
 
-EKSとAWS環境の両方をカバーすることがなぜ重要なのか、AWSのCloudTrail検知を簡単に見てみましょう。
+EKS　と　AWS　環境の両方をカバーすることがなぜ重要なのか、AWS　の　CloudTrail　検知を簡単に見てみましょう。
 
 ### AWS IAM Roles for Service Accounts (IRSA)
-AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) と呼ばれる、PodにAWS APIへのアクセス権を与える仕組みがあります。要するに、これはKubernetesの特定のサービスアカウントをAWSのIAMロールにバインドするもので、実行時にKubernetesサービスアカウントを利用するPodに、AWS IAMロールを利用するための認証情報を自動的にマウントします。
+AWS EKS　には、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) と呼ばれる、Pod　に　AWS API　へのアクセス権を与える仕組みがあります。要するに、これは　Kubernetes　の特定のサービスアカウントを　AWS　の　IAM　ロールにバインドするもので、実行時に　Kubernetes　サービスアカウントを利用する　Pod　に、AWS IAM　ロールを利用するための認証情報を自動的にマウントします。
 
-**security-playground**ネームスペースの**irsa** サービスアカウントは、**Action"： "s3:*"** ポリシーが適用されています。以下のコマンドを実行すると、その IAM Role の ARN を持つサービスアカウントの Annotation が表示されます：
+**security-playground**　ネームスペースの　**irsa** サービスアカウントは、**Action"： "s3:*"** ポリシーが適用されています。以下のコマンドを実行すると、その IAM Role の ARN を持つサービスアカウントの Annotation が表示されます：
 
 `kubectl get serviceaccount irsa -n security-playground -o yaml`
 
-次のようなインラインポリシーがあります。よく見かける、s3サービス用のものです（実際には、バケット自体だけでなくコンテンツもカバーするために2つあります）。これは、単一のバケットResourceに適切にスコープされており、ないよりはましですが、なぜこのサービスのための "*" が悪い考えなのかがわかるでしょう。
+次のようなインラインポリシーがあります。よく見かける、s3　サービス用のものです（実際には、バケット自体だけでなくコンテンツもカバーするために2つあります）。これは、単一のバケット　Resource　に適切にスコープされており、ないよりはましですが、なぜこのサービスのための "*" が悪い考えなのかがわかるでしょう。
 
 ```
 {
@@ -265,7 +265,7 @@ AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.
 }
 ```
 
-また、信頼関係を見ると、このロールはAWS IAMと統合するためにこの固有のOIDCプロバイダを割り当てられたEKSクラスタ内の **security-playground** ネームスペース内の **irsa** サービスアカウントによってのみ引き受けられることがわかります。
+次に信頼関係を見てみましょう。このロールは、AWS IAM　と統合するために固有の　OIDC　プロバイダを割り当てられた　EKS　クラスタ内の、 **security-playground** ネームスペース内の **irsa** サービスアカウントによってのみ引き受けられることがわかります。
 
 ```
 {
@@ -289,19 +289,19 @@ AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.
 ```
 
 ### Exploit
-実行時にAWS CLIをコンテナにインストールし、いくつかのコマンドを実行すると、PodにIRSAロールが割り当てられているかどうかがわかります。rootに**example-curls-bucket-public.sh**ファイルがあるので、`cat example-curls-bucket-public.sh`で内容を確認して、`./example-curls-bucket-public.sh**`実行します。
+実行時に AWS CLI をコンテナにインストールし、いくつかのコマンドを実行すると、Pod に IRSA ロールが割り当てられているかどうかがわかります。/root に **example-curls-bucket-public.sh** ファイルがあるので、`cat example-curls-bucket-public.sh` で内容を確認して、`./example-curls-bucket-public.sh`　を実行します。
 
-AWS CLIのインストールは成功しましたが、S3の変更はアクセス権がないので失敗しました。security-playground Deploymentのマニフェストを更新し、これまで使用していた**default**のサービスアカウントではなく、この**irsa**サービスアカウントを使用するようにしましょう。この変更を適用するには、`kubectl apply -f security-playground-irsa.yaml` を実行します。ここで、`./example-curls-bucket-public.sh` を再実行すると、今度はうまくいきます！
+AWS CLI のインストールは成功しましたが、S3 の変更はアクセス権がないので失敗しました。security-playground Deployment のマニフェストを更新し、これまで使用していた **default** のサービスアカウントではなく、この **irsa** サービスアカウントを使用するようにしましょう。この変更を適用するには、`kubectl apply -f security-playground-irsa.yaml` を実行します。ここで、`./example-curls-bucket-public.sh` を再実行すると、今度はうまくいきます！
 
-S3コンソールでこのバケットを見ると、バケット（とそのすべてのコンテンツ）がパブリックになっていることがわかるでしょう（そして、攻撃者はS3のパブリックAPIからすぐにダウンロードすることができます）！
+S3 コンソールでこのバケットを見ると、バケット（とそのすべてのコンテンツ）がパブリックになっていることがわかるでしょう（そして、攻撃者は S3 のパブリック API からすぐにダウンロードすることができます）！
 ![](instruction-images/bucketpublic.png)
 
 ### Sysdigによる検知
 
-ホスト側では、AWSに対して実行されているコマンドを含む多くの**Drift Detections**が表示されます。これはAWSのようなCLIをイメージに含めるべきでないもっともな理由です！![](instruction-images/s3drift.png)
+ホスト側では、AWSに対して実行されているコマンドを含む多くの**Drift Detections**が表示されます。これはAWS CLIをイメージに含めるべきでないもっともな理由です！![](instruction-images/s3drift.png)
 
-AWS API側では下記イベントで、バケットが公開されることに対する保護が削除されただけでなく、新しいBucket Policy(バケットを公開する)も適用されたことがわかります！
-> **注**： 今回のラボ環境では、Sysdigのユーザー/チームに対してKubernetesクラスタとジャンプボックスだけを表示するようにフィルタリングされているため、残念ながらこれらAWS API側の情報は表示されません。講師は、皆さんに代わってこれらのイベントをお見せすることが可能です。
+AWS API 側では下記イベントで、バケットが公開されることに対する保護が削除されただけでなく、新しい Bucket Policy (バケットを公開する)も適用されたことがわかります！
+> **注**： 今回のラボ環境では、Sysdig のユーザー/チームに対して Kubernetes クラスタとジャンプボックスだけを表示するようにフィルタリングされているため、残念ながらこれら AWS API 側の情報は表示されません。講師は、皆さんに代わってこれらのイベントをお見せすることが可能です。
  
 ![](instruction-images/s3cloudevents.png)
 ![](instruction-images/s3cloudevents2.png)
@@ -310,9 +310,9 @@ AWS API側では下記イベントで、バケットが公開されることに�
 
 この IRSA の例は、以下の方法で防ぐことができます：
 * IRSA のポリシーで、パブリックブロックの削除を許可したりバケットポリシー（ファイルなどの読み書き）を適用できてしまう s3* を使用するのではなく、よりきめ細かく最小特権を設定する。
-    * [Permissions Boundary](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html)や[Service Control Policies (SCPs)](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html)のようなものも、このような過剰な権限を持つロールが作成されないようにするために役立ちます。
+    * [Permissions Boundary](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html) や [Service Control Policies (SCPs)](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html) のようなものも、このような過剰な権限を持つロールが作成されないようにするために役立ちます。
     * ![](https://docs.aws.amazon.com/images/IAM/latest/UserGuide/images/EffectivePermissions-scp-boundary-id.png)
-* SysdigでContainer Driftを強制し、AWS CLIが実行時にダウンロード/実行できないようにする（イメージに含まれていないことも確認する）。
+* Sysdig で Container Drift を強制し、AWS CLI が実行時にダウンロード/実行できないようにする（イメージに含まれていないことも確認する）。
 
 今回の例ではどちらを使っても防ぐことができますが、両方とも実施するのが理想的です。
 
