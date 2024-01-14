@@ -234,51 +234,52 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 
 ## モジュール 2 - ランタイム脅威の検知と防御（クラウド/AWS）
 
-Sysdigのランタイム脅威検知は、LinuxカーネルのシスコールとKubernetesの監査証跡に限定されません - AWSのCloudTrail（同様にAzure、GCP、Okta、GitHubなど、常に追加されます）に対してエージェントレスでランタイム脅威を検知することもできます！エージェントレスというのは、CloudTrailを監視するFalcoがSysdigのSaaSバックエンドで実行されることを意味します。オプションとして[Cloud Connector](https://docs.sysdig.com/en/docs/installation/sysdig-secure/connect-cloud-accounts/aws/agent-based-with-ciem/)と呼ばれるお客様のアカウントでエージェントを実行することも可能ですが、ほとんどのお客様はSysdigがサービスとしてそれを行うことを好まれます。
+Sysdigのランタイム脅威検知は、LinuxカーネルのシステムコールとKubernetesの監査証跡に限定されません - AWSのCloudTrail（同様にAzure、GCP、Okta、GitHubなど）に対してエージェントレスでランタイム脅威を検知することもできます！エージェントレスというのは、CloudTrailを監視するFalcoがSysdigのSaaSバックエンドで実行されることを意味します。オプションとして[Cloud Connector](https://docs.sysdig.com/en/docs/installation/sysdig-secure/connect-cloud-accounts/aws/agent-based-with-ciem/)と呼ばれるお客様のアカウントでエージェントを実行することも可能ですが、ほとんどのお客様はSysdigがサービスとしてSaaS側で行うことを好まれます。
 
-AWSのCloudTrailの検出を簡単に見てみよう - EKSとAWS環境の両方をカバーすることがなぜ重要なのか。
+EKSとAWS環境の両方をカバーすることがなぜ重要なのか、AWSのCloudTrail検知を簡単に見てみましょう。
 
 ### AWS IAM Roles for Service Accounts (IRSA)
-AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) と呼ばれる、PodにAWS APIへのアクセス権を与える仕組みがある。要するに、これはKubernetesの特定のサービスアカウントをAWSのIAMロールにバインドするもので、実行時にそのKubernetesサービスアカウントを利用するPodに、そのAWS IAMロールを利用するための認証情報を自動的にマウントします。
+AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) と呼ばれる、PodにAWS APIへのアクセス権を与える仕組みがあります。要するに、これはKubernetesの特定のサービスアカウントをAWSのIAMロールにバインドするもので、実行時にKubernetesサービスアカウントを利用するPodに、AWS IAMロールを利用するための認証情報を自動的にマウントします。
 
-security-playground**Namespaceの**irsa** ServiceAccountは、**Action"： "s3:*"** ポリシーが適用されています。以下のコマンドを実行すると、その IAM Role の ARN を持つ ServiceAccount の Annotation が表示されます：
-**kubectl get serviceaccount irsa -n security-playground -o yaml**
+**security-playground**ネームスペースの**irsa** サービスアカウントは、**Action"： "s3:*"** ポリシーが適用されています。以下のコマンドを実行すると、その IAM Role の ARN を持つサービスアカウントの Annotation が表示されます：
 
-次のようなインラインポリシーがあります。よく見かける、s3サービス用の*です（実際には、バケット自体だけでなくコンテンツもカバーするために2つあります）。これは、単一のバケツResourceに適切にスコープされており、ないよりはましですが、なぜこのサービスのための*が悪い考えなのかがわかるでしょう。
+`kubectl get serviceaccount irsa -n security-playground -o yaml`
+
+次のようなインラインポリシーがあります。よく見かける、s3サービス用のものです（実際には、バケット自体だけでなくコンテンツもカバーするために2つあります）。これは、単一のバケットResourceに適切にスコープされており、ないよりはましですが、なぜこのサービスのための "*" が悪い考えなのかがわかるでしょう。
 
 ```
 {
-    "バージョン"： "2012-10-17",
-    "Statement"： [
+    "Version": "2012-10-17",
+    "Statement": [
         {
-            "Action"： "s3:*",
-            "リソース"： "arn:aws:s3:::attendeestack1-bucket83908e77-1d84qdfaymy9u",
-            "効果"： "許可"
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::attendeestack1-bucket83908e77-1d84qdfaymy9u",
+            "Effect": "Allow"
         },
         {
-            "アクション"： "s3:*",
-            "リソース"： "arn:aws:s3:::attendeestack1-bucket83908e77-1d84qdfaymy9u/*",
-            "効果"： "許可"
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::attendeestack1-bucket83908e77-1d84qdfaymy9u/*",
+            "Effect": "Allow"
         }
     ]
 }
 ```
 
-また、信頼関係を見ると、このロールは AWS IAM と統合するためにこの固有の OIDC プロバイダを割り当てられた EKS クラスタ内の **security-playground** Namespace 内の **irsa** ServiceAccount によってのみ引き受けられることがわかります。
+また、信頼関係を見ると、このロールはAWS IAMと統合するためにこの固有のOIDCプロバイダを割り当てられたEKSクラスタ内の **security-playground** ネームスペース内の **irsa** サービスアカウントによってのみ引き受けられることがわかります。
 
 ```
 {
-    "Version"： "2012-10-17",
-    "Statement"： [
+    "Version": "2012-10-17",
+    "Statement": [
         {
-            "効果"： 許可
-            "Principal"： {
-                "Federated"： "arn:aws:iam::090334159717:oidc-provider/oidc.eks.ap-southeast-2.amazonaws.com/id/25A0C359024FB4B509E838B84988ABB0"
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::090334159717:oidc-provider/oidc.eks.ap-southeast-2.amazonaws.com/id/25A0C359024FB4B509E838B84988ABB0"
             },
-            "アクション"： "sts:AssumeRoleWithWebIdentity"、
-            "条件"： {
-                "StringEquals"： {
-                    "oidc.eks.ap-southeast-2.amazonaws.com/id/25A0C359024FB4B509E838B84988ABB0:aud": "sts.amazonaws.com"、
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "oidc.eks.ap-southeast-2.amazonaws.com/id/25A0C359024FB4B509E838B84988ABB0:aud": "sts.amazonaws.com",
                     "oidc.eks.ap-southeast-2.amazonaws.com/id/25A0C359024FB4B509E838B84988ABB0:sub": "system:serviceaccount:security-playground:irsa"
                 }
             }
@@ -288,33 +289,32 @@ security-playground**Namespaceの**irsa** ServiceAccountは、**Action"： "s3:*
 ```
 
 ### Exploit
-実行時にAWS CLIをコンテナにインストールし、いくつかのコマンドを実行すると、PodにIRSAロールが割り当てられているかどうかがわかります。rootに**example-curls-bucket-public.sh**ファイルがあるので、**cat example-curls-bucket-public.sh**で見て、**./example-curls-bucket-public.sh**で実行する。
+実行時にAWS CLIをコンテナにインストールし、いくつかのコマンドを実行すると、PodにIRSAロールが割り当てられているかどうかがわかります。rootに**example-curls-bucket-public.sh**ファイルがあるので、`cat example-curls-bucket-public.sh`で内容を確認して、`./example-curls-bucket-public.sh**`実行します。
 
-AWS CLIのインストールは成功しましたが、S3の変更はアクセス権がないので失敗しました。security-playground Deploymentのマニフェストを更新し、これまで使用していた**default**のServiceAccountではなく、この**irsa** ServiceAccountを使用するようにしました。この変更を適用するには、**kubectl apply -f security-playground-irsa.yaml** を実行します。ここで、**./example-curls-bucket-public.sh** を再実行すると、今度はうまくいきます！
+AWS CLIのインストールは成功しましたが、S3の変更はアクセス権がないので失敗しました。security-playground Deploymentのマニフェストを更新し、これまで使用していた**default**のサービスアカウントではなく、この**irsa**サービスアカウントを使用するようにしましょう。この変更を適用するには、`kubectl apply -f security-playground-irsa.yaml` を実行します。ここで、`./example-curls-bucket-public.sh` を再実行すると、今度はうまくいきます！
 
-S3コンソールでこのバケットを見ると、バケット（とそのすべてのコンテンツ）がパブリックになっていることがわかるだろう（そして、攻撃者はS3のパブリックAPIからすぐにダウンロード/抽出することができる）！
+S3コンソールでこのバケットを見ると、バケット（とそのすべてのコンテンツ）がパブリックになっていることがわかるでしょう（そして、攻撃者はS3のパブリックAPIからすぐにダウンロードすることができます）！
 ![](instruction-images/bucketpublic.png)
 
-### Sysdigの検出
+### Sysdigによる検知
 
-ホスト側では、AWSに対して実行されているコマンドを含む多くの**Drift Detections**が表示されます。これはAWSのようなCLIをイメージに含めない良い理由です！![](インストラクション画像/s3drift.png)
+ホスト側では、AWSに対して実行されているコマンドを含む多くの**Drift Detections**が表示されます。これはAWSのようなCLIをイメージに含めるべきでないもっともな理由です！![](instruction-images/s3drift.png)
 
-しかし、AWS API側では、このバケットが公開されることに対する保護が削除されただけでなく、新しいBucket Policy(バケットを公開する)も適用されたことがわかります！
-
-![](説明画像/s3cloudevents.png)
-![](説明画像/s3cloudevents2.png)
-
-> 注**： Sysdigのユーザー/チームがKubernetesクラスタとJumpboxだけを表示するようにフィルタリングされているため、残念ながら、これはまだ表示されません。コースのインストラクターは、皆さんが今日このAWSアカウントでこれらのコマンドを実行する際に、これらのイベントをお見せします - そして、それらは今後Team scopingに関するワークショップが改善された後に、ワークショップの参加者に見えるようになります。
+AWS API側では下記イベントで、バケットが公開されることに対する保護が削除されただけでなく、新しいBucket Policy(バケットを公開する)も適用されたことがわかります！
+> **注**： 今回のラボ環境では、Sysdigのユーザー/チームに対してKubernetesクラスタとジャンプボックスだけを表示するようにフィルタリングされているため、残念ながらこれらAWS API側の情報は表示されません。講師は、皆さんに代わってこれらのイベントをお見せすることが可能です。
+ 
+![](instruction-images/s3cloudevents.png)
+![](instruction-images/s3cloudevents2.png)
 
 ### この攻撃を防ぐ方法/このワークロードを修正する方法
 
-この IRSA の例は、以下の方法で防ぐことができました：
-* IRSA のポリシーで s3* を使用せず、パブリックブロックの削除を許可したり、バケットポリシー（ファイルなどの読み書きのみ）を適用したりするなど、よりきめ細かく最小特権を設定すること。
-    * 権限境界](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html)や[サービス制御ポリシー(SCPs)](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html)のようなものも、このような過剰な権限を持つロールが作成されないようにするために役立ちます。
+この IRSA の例は、以下の方法で防ぐことができます：
+* IRSA のポリシーで、パブリックブロックの削除を許可したりバケットポリシー（ファイルなどの読み書き）を適用できてしまう s3* を使用するのではなく、よりきめ細かく最小特権を設定する。
+    * [Permissions Boundary](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html)や[Service Control Policies (SCPs)](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html)のようなものも、このような過剰な権限を持つロールが作成されないようにするために役立ちます。
     * ![](https://docs.aws.amazon.com/images/IAM/latest/UserGuide/images/EffectivePermissions-scp-boundary-id.png)
 * SysdigでContainer Driftを強制し、AWS CLIが実行時にダウンロード/実行できないようにする（イメージに含まれていないことも確認する）。
 
-今回の例ではどちらを使っても防ぐことができたが、理想的には両方を行うことだ。
+今回の例ではどちらを使っても防ぐことができますが、両方とも実施するのが理想的です。
 
 ## モジュール 3 - ホストとコンテナの脆弱性管理
 
