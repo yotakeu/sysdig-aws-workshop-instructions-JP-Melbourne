@@ -430,18 +430,18 @@ Sysdigはすべてのネットワークフローを追跡し、関係するす�
 これは、先ほどhello-serverでやったように、サービスへの入口を制御するだけでなく、 特にインターネットへの出口を制限するのにも便利です。
 
 先ほどの安全でないsecurity-playgroundの例で、これがどのように役立つかを見てみましょう：
-1. Sysdigブラウザのタブに戻る。
-1. Network** セクションで、**security-playground**ネームスペースと **Deployment**オブジェクトタイプを選択します。
+1. Sysdigブラウザのタブに戻ります。
+1. **Network** セクションで、**security-playground**ネームスペースと **Deployment**オブジェクトタイプを選択します。
     1. ![](instruction-images/network6.png)
-1. ここでは、hello-serverとの通信だけでなく、aptパッケージをダウンロードしたり、クリプトマイナープールと会話したりするために、curlを実行するときに呼び出されたすべてのインターネットIPも表示されます。
+1. ここでは、hello-serverとの通信だけでなく、aptパッケージをダウンロードしたり、クリプトマイナープールと会話するために、curlを実行するときに呼び出されたすべてのインターネットIPも表示されます。
 1. 上記で行ったように、すべてのインターネットEgressを除外したNetworkPolicyを生成できます。**Egress**タブに移動します。
     1. クラスタ外のすべてのIP/CIDRを除外するように、あらかじめデフォルト設定されています（線が赤くなっているのはそのためですが、NetworkPolicyを**kubectl apply**で適用するまでは、実際に通信はブロックされません）：
         1. hello-serverのチェックを外し、security-playgroundがhello-serverにEgressできないようにします。
-            1. もしこれらを許可したければ、各対象の右側にあるプラスアイコンのチェックマークをクリックすることができます。
+            1. もしこれらを再び許可したければ、各対象の右側にあるプラスアイコンのチェックマークをクリックすることができます。
     1. ![](instruction-images/network7.png)
-    1. これは、最初にcurlで実施した攻撃の多くを防ぐもう一つの方法です！
+    1. これは、最初にcurlで実施した攻撃の多くを防ぐ、もう一つの方法です！
 1. **Generated Policy**タブを開きます
-    1. 生成されたポリシーをそのまま使うのではなく、policyTypesからIngressの行を削除して、サービスには到達できるようにします。
+    1. 生成されたポリシーをそのまま使うのではなく、policyTypesからIngressの行を削除して、security-playgroundサービスには到達できるようにします。
         1. これをコピーしてテキストエディタに貼り付け、Ingressの行を削除してから、Ingressのないポリシーをクリップボードにコピーします。
     1. ![](instruction-images/network8.png)
 1. ジャンプボックス端末のブラウザタブに戻ります。
@@ -449,17 +449,17 @@ Sysdigはすべてのネットワークフローを追跡し、関係するす�
 1. `i`と入力して挿入モードに入ります。
 1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストします。
 1. Escを押して挿入モードを終了し、`:wq`と入力して保存して終了します。
-1. 適用するには、**kubectl apply -f policy2.yaml**と入力します。
+1. 適用するには、`kubectl apply -f policy2.yaml`と入力します。
 1. `./example-curls.sh`を再実行し、このNetworkPolicyでブロックされた内容がどの程度発生したかをメモします。
-    1. コンテナからホストに移動すると、NetworkPolicyは適用されなくなります（ただし、Nodeをカバーするファイアウォール/SecurityGroupは適用されます）。
+    1. もし、コンテナからホストに移動すると、NetworkPolicyは適用されなくなります（ただし、Nodeをカバーするファイアウォール/SecurityGroupは適用されます）。
         1. これが、コンテナのエスケープを防ぐ必要があるもう1つの大きな理由です！
 
 NetworkPoliciesの構文についてもっと知りたい場合は、よく使われるパターンの例を集めた素晴らしいリソースがGitHubにあります - https://github.com/ahmetb/kubernetes-network-policy-recipes.
 
 ## 結論
 
-以上、SysdigがAWS EKSを含むKubernetes環境のセキュリティ確保を支援するために顧客に提供している多くの機能の一部を、as-a-serviceで簡単に紹介しました。
+以上、SysdigがAWS EKSを含むKubernetes環境のセキュリティ確保を支援するために顧客に提供している多くの機能の一部を、as-a-serviceで簡単にご紹介しました。
 
-Sysdigがお客様のためにできることを、お客様の環境での無料トライアルで確認いただくこともできます。詳細は講師までお問い合わせください。
+Sysdigがお客様のためにできることを、お客様環境での無料トライアルでご確認いただくこともできます。詳細は講師までお問い合わせください。
 
 ご来場ありがとうございました！
