@@ -54,7 +54,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 
 伝統的な "ルール/ポリシー "ベースのアプローチに加え、脅威検知/防止機能を強化する3つの機能があります：
 * [コンテナ・ドリフト](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/drift-control/) - コンテナ・イメージに含まれていない実行可能ファイルの実行を検知し、オプションでその実行をブロックすることができます。
-* [クリプトマイニングML検出](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/machine-learning/) - クリプトマイニングの検出に特化した機械学習モデルを採用しています。
+* [クリプトマイニングML検知](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/machine-learning/) - クリプトマイニングの検知に特化した機械学習モデルを採用しています。
 * マルウェア（プレビュー） - 実行しようとするマルウェア（私たちがウォッチしているいくつかの脅威フィードで定義されている）を検知することができます。
 
 ### Sysdig 内でイベントを生成するための攻撃のシミュレーション
