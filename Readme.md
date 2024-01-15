@@ -365,8 +365,8 @@ Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソ�
 
 1. ブラウザのSysdigタブを開きます。
 1. **Posture**に移動し、次に**Compliance**に移動します。
-1. [Team and Zone-based authorization](https://docs.sysdig.com/en/docs/sysdig-secure/policies/zones/)を使用して、チームが自分のクラスタ/ゾーンのみを参照できるようにします。
-1. **CIS Amazon Elastic Kubernetes Service Benchmark**をクリックします（これはあなたのZoneに対して設定した唯一のコンプライアンス基準ですが、NIST、SOC2、PCIDSSなど他にも多くのコンプライアンス基準があります）。
+1. [Team and Zone-based authorization](https://docs.sysdig.com/en/docs/sysdig-secure/policies/zones/)を使用して、チームが自分のクラスタ/ゾーンのみを参照できるように設定してあります。
+1. **CIS Amazon Elastic Kubernetes Service Benchmark**をクリックします（これはあなたのZoneに対して設定した唯一のコンプライアンス標準ですが、NIST、SOC2、PCIDSSなど他にも多くのコンプライアンス標準があります）。
     1. ![](instruction-images/posture1.png)
 1. ここには、攻撃を防ぐためのコントロールがいくつかあります。
 1. それぞれの**Show Results**リンクをクリックすると、失敗したリソースのリストが表示されます。その後、**security-playground**リソースの隣にある**View Remediation**をクリックすると、修正手順を確認することができます：
@@ -384,48 +384,48 @@ Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソ�
 
 また、このツールは、ワークロードやクラスタに関するセキュリティ上の問題を修正するのに役立つだけでなく、監査人に対して、遵守すべき標準に準拠していることを証明するのにも役立ちます。
 
-## モジュール 5 - Kubernetes ネイティブファイアウォール (NetworkPolicies)
+## モジュール 5 - Kubernetes ネイティブ　ファイアウォール (NetworkPolicies)
 
-Kubernetesには組み込みのファイアウォールがあり、[NetworkPolices](https://kubernetes.io/docs/concepts/services-networking/network-policies/)と呼ばれるYAMLドキュメントを通して設定します。これらはIPやCIDRブロック/レンジだけでなく、Kubernetesの名前空間やラベルに基づいたルールを持つことができます。これはよりダイナミックで管理しやすくなります！
+Kubernetesには組み込みのファイアウォールがあり、[NetworkPolices](https://kubernetes.io/docs/concepts/services-networking/network-policies/)と呼ばれるYAMLドキュメントを通して設定します。これらはIPやCIDRブロック/レンジだけでなく、Kubernetesのネームスペースやラベルに基づいたルールを持つことができます。これはよりダイナミックで管理しやすくなります！
 
-EKSを含む多くのKubernetesディストリビューション/オファリングでは、すぐに有効にはなりません。EKSの場合、NetworkPolicy Providerを選択する必要があります。一般的なものは[Calico](https://www.tigera.io/project-calico/)と[Cilium](https://cilium.io/)です。AWSは[Calicoをインストールするためのドキュメント](https://docs.aws.amazon.com/eks/latest/userguide/calico.html)を提供している。Calicoはクラスタにプリインストールされています。これらのプロバイダは基本的に、各Kubernetes Nodeにローカルファイアウォールを設定し、必要に応じてNetworkPoliciesを適用するためにすべてのNodeでそれらを更新します。
+EKSを含む多くのKubernetesディストリビューションでは、すぐに有効にはなりません。EKSの場合、NetworkPolicy Providerを選択する必要があります。一般的なものは[Calico](https://www.tigera.io/project-calico/)と[Cilium](https://cilium.io/)です。AWSは[Calicoをインストールするためのドキュメント](https://docs.aws.amazon.com/eks/latest/userguide/calico.html)を提供しています。Calicoは今回のクラスタにプリインストールされています。これらのプロバイダは基本的に、各Kubernetes Nodeにローカルファイアウォールを設定し、必要に応じてNetworkPoliciesを適用するためにすべてのNodeでそれらを更新します。
 
-プロバイダをインストールした後でも、デフォルトではすべてのPodが他のすべてのPodと通信できます。そのため、そのトラフィックを制限するためのポリシーを実装する必要がある。最も安全なオプションは、デフォルトで拒否し、必要なものすべてを特別に許可することだ。既存の環境にポリシーを追加するのは少し大変かもしれません。そこでSysdigが役に立つ。
+プロバイダをインストールした後でも、デフォルトではすべてのPodが他のすべてのPodと通信できます。そのため、そのトラフィックを制限するためのポリシーを実装する必要がある。最も安全なオプションは、デフォルトで拒否し、必要なものすべてを特別に許可することです。既存の環境にポリシーを追加するのは少し大変かもしれません。そこでSysdigが役に立ちます。
 
-### Sysdig を使用してトラフィックを検出し、NetworkPolicies を生成します。
+### Sysdigを使用してトラフィックを検出し、NetworkPoliciesを生成する
 
-Sysdigはすべてのネットワークフローを追跡し、関係するすべてのKubernetesコンテキスト/ラベルを計算します。これにより、私たちが確認したトラフィックを表示し、そのトラフィックのみを許可するNetworkPoliciesを生成することができます。私たちのUIでは、あなたがそれらを許可したくない場合、私たちが見たもののチェックを外すことができます。
+Sysdigはすべてのネットワークフローを追跡し、関係するすべてのKubernetesコンテキスト/ラベルを計算します。これにより、トラフィックを表示し、特定のトラフィックのみを許可するNetworkPoliciesを生成することができます。私たちのUIでは、トラフィックを許可したくない場合、対象のトラフィックのチェックを外すことができます。
 
 この機能を利用するには
-1. ./example-curls-networkpolicy.sh**を実行して、security-playground Podがhello-server（別のNamespaceで実行中）にどのように到達できるかを確認してください。
-1. ブラウザで Sysdig タブを開きます。
+1. `./example-curls-networkpolicy.sh`を実行して、security-playground Podがhello-server（別のネームスペースで実行中）にどのように到達できるかを確認してください。
+1. ブラウザでSysdigタブを開きます。
 1. 左側の**Network**に移動します。
-1. EKSクラスタ、名前空間**hello**、タイプ**Service**を選択します。
+1. EKSクラスタ、ネームスペースとして**hello**、タイプとして**Service**を選択します。
     1. ![](instruction-images/network1.png)
-1. 右側のペインでは、hello Namespaceが以下のように構成されていることがわかります：
-    1. バックエンドは、hello-server という名前のサービスと hello-server という名前のデプロイメントで構成されます。
+1. 右側のペインでは、helloネームスペースが以下のように構成されていることがわかります：
+    1. バックエンドは、hello-server という名前のサービスと hello-server という名前のデプロイメントで構成されています。
     1. hello-clientとhello-client-blockedという2つのフロントエンドアプリが、hello-serverバックエンドサービスと通信します。
-    1. また、security-playground サービスもバックエンドに接続していることがわかります（実行したエクスプロイトスクリプトには、接続するための **curl** がありました）。
+    1. また、security-playground サービスもバックエンドに接続していることがわかります（実行したエクスプロイトスクリプトには、接続するための **curl**がありました）。
     1. ![](instruction-images/network2.png)
-1. Ingress**タブをクリックする。
+1. **Ingress**タブをクリックします。
 1. ここで、hello-serverサービスと通信したくないもののチェックを外すことができます。
-    1. hello-client**以外のすべてのチェックを外します。
+    1. **hello-client**以外のすべてのチェックを外します。
     1. ![](instruction-images/network3.png)
-1. Topology**に戻り、ブロックするものを赤い線で囲みます（hello-clientへのパスだけが許可されています）。
+1. **Topology**に戻ると、ブロックするトラフィックが赤い線で表示されます（hello-clientからのパスだけが許可されています）。
     1. ![](instruction-images/network4.png)
-1. 生成されたポリシー**をクリックし、すべての内容をクリップボードにコピーします。
-    1.![](指示画像/ネットワーク5.png)
-1. ジャンプボックス端末のブラウザタブに戻る
-1. vi policy.yaml**を実行します。
-1. Iと入力して挿入モードに入る
-1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストする。
-1. Escを押して挿入モードを終了し、**:wq**と入力して保存して終了する。
-1. 適用するには、**kubectl apply -f policy.yaml**と入力します。
-1. ./example-curls-networkpolicy.sh**を再度実行し、新しいNetworkPolicyによりhello-serverに到達できないことを確認します（タイムアウトします）。
-1. kubectl logs deployment/hello-client-blocked -n hello**を実行し、hello-client-blockedサービスのログを確認します。
-1. kubectl logs deployment/hello-client -n hello**を実行すると、hello-clientサービスからのログが表示されます。
+1. **Generated Policy**タブをクリックし、すべての内容をクリップボードにコピーします。
+    1.![](instruction-images/network5.png)
+1. ジャンプボックス端末のブラウザタブに戻ります。
+1. `vi policy.yaml`を実行します。
+1. Iと入力して挿入モードに入ります。
+1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストします。
+1. Escを押して挿入モードを終了し、`:wq`と入力して保存して終了します。
+1. 適用するには、`kubectl apply -f policy.yaml`と入力します。
+1. `./example-curls-networkpolicy.sh`を再度実行し、新しいNetworkPolicyによりhello-serverに到達できないことを確認します（タイムアウトします）。
+1. `kubectl logs deployment/hello-client-blocked -n hello`を実行し、hello-client-blockedサービスのログを確認します。
+1. `kubectl logs deployment/hello-client -n hello`を実行すると、hello-clientサービスのログが表示されます。
 
-#### ネットワークのイグレスの制御 - 特にインターネットへのイグレスの制御
+#### ネットワークのEgressの制御 - 特にインターネットへのEgressの制御
 
 これは、先ほどhello-serverでやったように、サービスへの入口を制御するだけでなく、 特にインターネットへの出口を制限するのにも便利です。
 
