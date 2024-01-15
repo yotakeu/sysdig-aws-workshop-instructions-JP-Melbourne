@@ -360,7 +360,8 @@ Sysdig のランタイム脆弱性スキャンを確認するには、以下の�
 
 Sysdigは、CIS、NIST、SOC 2、PCI DSS、ISO 27001など、多くの一般的な規格に準拠していることを確認できます。現在の全リストをご覧になるには、左側の**Policies**をクリックし、**Posture**の見出しの下にある**Policies**をクリックしてください。
 
-Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソースのセキュリティベンチマークを公開しています。詳しくはhttps://www.cisecurity.org/benchmark/kubernetes。このモジュールでは、クラスタとそのワークロードがこの標準に準拠しているかどうかを調べます。
+Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソースのセキュリティベンチマークを公開しています。詳しくはhttps://www.cisecurity.org/benchmark/kubernetesをご参照ください。
+このモジュールでは、クラスタとそのワークロードがこの標準に準拠しているかどうかを調べます。
 
 1. ブラウザのSysdigタブを開きます。
 1. **Posture**に移動し、次に**Compliance**に移動します。
