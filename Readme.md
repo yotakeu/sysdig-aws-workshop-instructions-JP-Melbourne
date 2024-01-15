@@ -354,32 +354,32 @@ Sysdig のランタイム脆弱性スキャンを確認するには、以下の�
 
 また、[レジストリ内のイメージをスキャンする機能](https://docs.sysdig.com/en/docs/installation/sysdig-secure/install-registry-scanner/) もありますが、このワークショップでは触れません。
 
-## モジュール4 - Kubernetesの姿勢/コンプライアンス（設定ミスの修正など）
+## モジュール4 - Kubernetesのポスチャー/コンプライアンス（設定ミスの修正など）
 
-モジュール1で学んだように、Kubernetes/EKSクラスタとその上のワークロードが適切に設定されていることは非常に重要です。これは、お客様の姿勢（お客様のすべての設定を総合したもの）と、それらが様々な標準/ベンチマークに準拠しているかどうかに関するものであるため、「姿勢」または「コンプライアンス」と呼ばれます。
+モジュール1で学んだように、Kubernetes/EKSクラスタとその上のワークロードが適切に設定されていることは非常に重要です。これは、お客様のポスチャー（お客様のすべての設定を総合したもの）と、それらが様々な標準/ベンチマークに準拠しているかどうかに関するものであるため、「ポスチャー」または「コンプライアンス」と呼ばれます。
 
-Sysdigは、CIS、NIST、SOC 2、PCI DSS、ISO 27001など、多くの一般的な規格に準拠していることを確認できます。現在の全リストをご覧になるには、左側の**ポリシー**をクリックし、**姿勢**の見出しの下にある**ポリシー**をクリックしてください。
+Sysdigは、CIS、NIST、SOC 2、PCI DSS、ISO 27001など、多くの一般的な規格に準拠していることを確認できます。現在の全リストをご覧になるには、左側の**Policies**をクリックし、**Posture**の見出しの下にある**Policies**をクリックしてください。
 
 Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソースのセキュリティベンチマークを公開しています。詳しくはhttps://www.cisecurity.org/benchmark/kubernetes。このモジュールでは、クラスタとそのワークロードがこの標準に準拠しているかどうかを調べます。
 
-1. ブラウザの Sysdig タブを開きます。
-1. Posture**に移動し、次に**Compliance**に移動します。
-1. Team and Zone-based authorization](https://docs.sysdig.com/en/docs/sysdig-secure/policies/zones/)を使用して、チームが自分のクラスタ/ゾーンのみを参照できるようにします。
-1. あなたの見出しの下にある**CIS Amazon Elastic Kubernetes Service Benchmark**をクリックします（これはあなたのZoneに対して設定した唯一のコンプライアンス基準ですが、NIST、SOC2、PCIDSSなど他にも多くのコンプライアンス基準があります）。
-    1. ![](指示画像/姿勢1.png)
-1. ここには、私たちの攻撃を防ぐためのコントロールがいくつかあります。
-1. それぞれの**Show Results**リンクをクリックすると、失敗したリソースのリストが表示されます。その後、**security-playground**リソースの隣にある**View Remediation**をクリックすると、改善手順を見ることができます：
-    1. 4.2.6 ルートコンテナの入場を最小限にする
-        1. RunAsUser rootが設定されているか、設定されていないコンテナ
-        1. ルートを許可するコンテナ
-    1. 4.2.1 特権コンテナの入室を最小限にする
-        1. 特権として実行されるコンテナ
-    1. 4.1.5 デフォルトのサービスアカウントが積極的に使用されないようにする。
-        1. デフォルト」アカウントへの直接アクセス
-    1. ![](指示画像/姿勢2.png)
-    1.![](指示画像/姿勢3.png)
+1. ブラウザのSysdigタブを開きます。
+1. **Posture**に移動し、次に**Compliance**に移動します。
+1. [Team and Zone-based authorization](https://docs.sysdig.com/en/docs/sysdig-secure/policies/zones/)を使用して、チームが自分のクラスタ/ゾーンのみを参照できるようにします。
+1. **CIS Amazon Elastic Kubernetes Service Benchmark**をクリックします（これはあなたのZoneに対して設定した唯一のコンプライアンス基準ですが、NIST、SOC2、PCIDSSなど他にも多くのコンプライアンス基準があります）。
+    1. ![](instruction-images/posture1.png)
+1. ここには、攻撃を防ぐためのコントロールがいくつかあります。
+1. それぞれの**Show Results**リンクをクリックすると、失敗したリソースのリストが表示されます。その後、**security-playground**リソースの隣にある**View Remediation**をクリックすると、修正手順を確認することができます：
+    1. 4.2.6 Minimize the admission of root containers
+        1. Container with RunAsUser root or not set
+        1. Container permitting root
+    1. 4.2.1 Minimize the admission of privileged containers
+        1. Container running as privileged
+    1. 4.1.5 Ensure that the default service accounts are not actively used
+        1. Access granted to "default" account directly
+    1. ![](instruction-images/posture2.png)
+    1. ![](instruction-images/posture3.png)
 
-もし、**security-playground** のこれらの設定が CIS の EKS Benchmark をパスするように設定されていたら、 **security-playground-unprivileged** ワークロードと同じようになる。
+もし、**security-playground**のこれらの設定がCISのEKS Benchmarkをパスするように設定されていたら、先ほどテストした **security-playground-unprivileged**ワークロードと同じようになります。
 
 また、このツールは、ワークロードやクラスタに関するセキュリティ上の問題を修正するのに役立つだけでなく、監査人に対して、遵守すべき標準に準拠していることを証明するのにも役立ちます。
 
