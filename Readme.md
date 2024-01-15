@@ -229,7 +229,7 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 |7|機密データを流出させるために同じノード上の別のPod内で Postgres CLIのpsqlを実行するためにcrictl コマンドを使用する|許可される|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たないため）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たないため）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たないため）|
 |8|別の極悪なワークロードを起動するためにKubernetes CLIのkubectlを使用する|許可される|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|ブロックされる（ServiceAccountがオーバープロビジョニングされておらず、Container Driftブロックによってkubectlのインストールが妨げられているため）|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|
 |9*|security-playgroundポッドからノードのAWS EC2 Instance Metadataエンドポイントに対してcurlコマンドを実行する|許可される|許可される|許可される|許可される|
-|10|xmrigクリプトマイナーの実行|許可される|許可される|ブロックされる（xmrigのインストールを防止するContainer Driftブロックによる）|ブロックされる（xmrigの起動を防止するMalwareブロックによる）|
+|10|xmrigクリプトマイナーの実行|許可される|許可される|ブロックされる（xmrigの起動を防止するContainer Driftブロックによる）|ブロックされる（xmrigの起動を防止するMalwareブロックによる）|
 
 *そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックできる可能性があります。これはこの後のNetworkPolicyのラボで実施します。
 
