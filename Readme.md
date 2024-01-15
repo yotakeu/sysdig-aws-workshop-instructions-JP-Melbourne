@@ -390,7 +390,7 @@ Kubernetesには組み込みのファイアウォールがあり、[NetworkPolic
 
 EKSを含む多くのKubernetesディストリビューションでは、すぐに有効にはなりません。EKSの場合、NetworkPolicy Providerを選択する必要があります。一般的なものは[Calico](https://www.tigera.io/project-calico/)と[Cilium](https://cilium.io/)です。AWSは[Calicoをインストールするためのドキュメント](https://docs.aws.amazon.com/eks/latest/userguide/calico.html)を提供しています。Calicoは今回のクラスタにプリインストールされています。これらのプロバイダは基本的に、各Kubernetes Nodeにローカルファイアウォールを設定し、必要に応じてNetworkPoliciesを適用するためにすべてのNodeでそれらを更新します。
 
-プロバイダをインストールした後でも、デフォルトではすべてのPodが他のすべてのPodと通信できます。そのため、そのトラフィックを制限するためのポリシーを実装する必要がある。最も安全なオプションは、デフォルトで拒否し、必要なものすべてを特別に許可することです。既存の環境にポリシーを追加するのは少し大変かもしれません。そこでSysdigが役に立ちます。
+プロバイダをインストールした後でも、デフォルトではすべてのPodが他のすべてのPodと通信できます。そのため、そのトラフィックを制限するためのポリシーを実装する必要があります。最も安全なオプションは、デフォルトで拒否し、必要なものすべてを特別に許可することです。既存の環境にポリシーを追加するのは少し大変かもしれません。そこでSysdigが役に立ちます。
 
 ### Sysdigを使用してトラフィックを検出し、NetworkPoliciesを生成する
 
@@ -417,7 +417,7 @@ Sysdigはすべてのネットワークフローを追跡し、関係するす�
     1.![](instruction-images/network5.png)
 1. ジャンプボックス端末のブラウザタブに戻ります。
 1. `vi policy.yaml`を実行します。
-1. Iと入力して挿入モードに入ります。
+1. `i`と入力して挿入モードに入ります。
 1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストします。
 1. Escを押して挿入モードを終了し、`:wq`と入力して保存して終了します。
 1. 適用するには、`kubectl apply -f policy.yaml`と入力します。
@@ -429,38 +429,37 @@ Sysdigはすべてのネットワークフローを追跡し、関係するす�
 
 これは、先ほどhello-serverでやったように、サービスへの入口を制御するだけでなく、 特にインターネットへの出口を制限するのにも便利です。
 
-先ほどの安全でないセキュリティ・プレイグラウンドの例で、これがどのように役立つかを見てみましょう：
+先ほどの安全でないsecurity-playgroundの例で、これがどのように役立つかを見てみましょう：
 1. Sysdigブラウザのタブに戻る。
-1. Network** セクションで、**security-playground** 名前空間と **Deployment** オブジェクトタイプを選択します。
+1. Network** セクションで、**security-playground**ネームスペースと **Deployment**オブジェクトタイプを選択します。
     1. ![](instruction-images/network6.png)
-1. ここでは、hello-server の相互作用の反対側(hello-server を呼び出すこのデプロイメント)だけでなく、apt パッケージをダウンロードしたり、クリプトマイナープールと話したりするために、curl を実行するときに呼び出されたすべてのインターネット IP も表示されます。
-1. 上記で行ったように、すべてのインターネットegressを除外したNetworkPolicyを 生成できます。
-    1. 実際には、クラスタ外のすべてのIP/CIDRを除外するようにデフォルト設定します（線が赤くなっているのはそのためです）：
-        1. hello-serverのチェックを外し、security-playgroundがhello-serverにegressできないようにする。
-        1. hello-serverのチェックを外して、security-playgroundがそのIPにイグジットできないようにする。
-            1. もしこれらを許可したければ、それらの右側にあるプラスアイコンのチェックマークをクリックすることができる。
-    1.![](インストラクション画像/ネットワーク7.png)
-    1. これは、最初にカールでやったことの多くを防ぐもう一つのコントロールである！
-1. Generated Policyタブを開く
-    1. 生成されたポリシーをそのまま使うのではなく、policyTypesからIngressの行を削除して、最初にサービスに到達できるようにする。
+1. ここでは、hello-serverとの通信だけでなく、aptパッケージをダウンロードしたり、クリプトマイナープールと会話したりするために、curlを実行するときに呼び出されたすべてのインターネットIPも表示されます。
+1. 上記で行ったように、すべてのインターネットEgressを除外したNetworkPolicyを生成できます。**Egress**タブに移動します。
+    1. クラスタ外のすべてのIP/CIDRを除外するように、あらかじめデフォルト設定されています（線が赤くなっているのはそのためですが、NetworkPolicyを**kubectl apply**で適用するまでは、実際に通信はブロックされません）：
+        1. hello-serverのチェックを外し、security-playgroundがhello-serverにEgressできないようにします。
+            1. もしこれらを許可したければ、各対象の右側にあるプラスアイコンのチェックマークをクリックすることができます。
+    1. ![](instruction-images/network7.png)
+    1. これは、最初にcurlで実施した攻撃の多くを防ぐもう一つの方法です！
+1. **Generated Policy**タブを開きます
+    1. 生成されたポリシーをそのまま使うのではなく、policyTypesからIngressの行を削除して、サービスには到達できるようにします。
         1. これをコピーしてテキストエディタに貼り付け、Ingressの行を削除してから、Ingressのないポリシーをクリップボードにコピーします。
     1. ![](instruction-images/network8.png)
-1. ジャンプボックス端末のブラウザタブに戻る
-1. vi policy2.yaml**を実行する。
-1. Iと入力して挿入モードに入る
-1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストする。
-1. Escを押して挿入モードを終了し、**:wq**と入力して保存して終了する。
+1. ジャンプボックス端末のブラウザタブに戻ります。
+1. `vi policy2.yaml`を実行します。
+1. `i`と入力して挿入モードに入ります。
+1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストします。
+1. Escを押して挿入モードを終了し、`:wq`と入力して保存して終了します。
 1. 適用するには、**kubectl apply -f policy2.yaml**と入力します。
-1. **example-curls.sh**を再実行し、このNetworkPolicyでブロックされた内容がどの程度起こったかをメモします。
-    1. コンテナからホストに移動すると、NetworkPolicyは適用されなくなる（ただし、Nodeをカバーするファイアウォール/SecurityGroupは適用される）。
+1. `./example-curls.sh`を再実行し、このNetworkPolicyでブロックされた内容がどの程度発生したかをメモします。
+    1. コンテナからホストに移動すると、NetworkPolicyは適用されなくなります（ただし、Nodeをカバーするファイアウォール/SecurityGroupは適用されます）。
         1. これが、コンテナのエスケープを防ぐ必要があるもう1つの大きな理由です！
 
-NetworkPoliciesの構文についてもっと知りたいなら、GitHubによく使われるパターンの例を集めた素晴らしいリソースがある - https://github.com/ahmetb/kubernetes-network-policy-recipes.
+NetworkPoliciesの構文についてもっと知りたい場合は、よく使われるパターンの例を集めた素晴らしいリソースがGitHubにあります - https://github.com/ahmetb/kubernetes-network-policy-recipes.
 
 ## 結論
 
-以上、SysdigがAWS EKSを含むKubernetes環境のセキュリティ確保を支援するために顧客に提供している多くの機能の一部をas-a-serviceで簡単に紹介しました。
+以上、SysdigがAWS EKSを含むKubernetes環境のセキュリティ確保を支援するために顧客に提供している多くの機能の一部を、as-a-serviceで簡単に紹介しました。
 
-Sysdigがお客様のためにできることを、お客様の環境での無料トライアルでもっとご紹介したいと思います。詳細はファシリテーターまでお問い合わせください。
+Sysdigがお客様のためにできることを、お客様の環境での無料トライアルで確認いただくこともできます。詳細は講師までお問い合わせください。
 
 ご来場ありがとうございました！
