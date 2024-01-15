@@ -230,6 +230,22 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 |9*|Running a curl command against the AWS EC2 Instance Metadata endpoint for the Node from the security-playground Pod|allowed|allowed|allowed|allowed|
 |10|Run the xmrig crypto miner|allowed|allowed|blocked (by Container Drift Enforcement blocking xmrig from being installed)|blocked (by Malware Enforcement)
 
+
+|example-curl.shでの悪用|example-curl|security-playground|security-playground-restricted + コンテナ・ドリフトの強制|security-playground-restricted + マルウェアの強制|
+
+|example-curl.shでの悪用|example-curl|security-playground|security-playground-restricted|security-playground-restricted + container driftのブロック|security-playground-restricted + マルウェアのブロック|
+|-|-|-|-|-|-|
+|1|機密パス/etc/shadowの読み込み|許可される|ブロック(rootとして実行されないことで)|ブロック(rootとして実行されないことで)|ブロック(rootとして実行されないことで)|
+|2|ファイルを/binに書き込み、それを`chmod +x'して実行する|許可される|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|
+|3|aptからnmapをインストールしてネットワークスキャンを実行する|許可される|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行しないことで)|ブロックされる(rootとして実行しないことで)|
+|4|nsenterコマンドを実行し、コンテナLinuxの名前空間からホストに「抜け出す」|許可される|ブロック（root権限で実行せず、hostPIDと特権的なsecurityContextを指定しない）|ブロック（root権限で実行せず、hostPIDと特権的なsecurityContextを指定しない）|ブロック（root権限で実行せず、hostPIDと特権的なsecurityContextを指定しない）|許可|
+|5|ノードのコンテナランタイムに対して crictl コマンドを実行する|許可される|ブロックされる（root として実行せず、hostPID と特権 securityContext を指定しない）|ブロックされる（root として実行せず、hostPID と特権 securityContext を指定しない）|ブロックされる（root として実行せず、hostPID と特権 securityContext を指定しない）|ブロックされる|
+|6|同じノード上の別のPodからKubernetesのシークレットを取得するためにcrictlコマンドを使用すること|許可される|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる|
+|7|機密データを流出させるために同じノード上の別の Pod 内で Postgres CLI の psql を実行するために crictl コマンドを使用すること|許可される|ブロックされる（root として実行されておらず、hostPID と特権的な securityContext を持たない）|ブロックされる（root として実行されておらず、hostPID と特権的な securityContext を持たない）|ブロックされる（root として実行されておらず、hostPID と特権的な securityContext を持たない）|ブロックされる|
+|8|別の極悪なワークロードを起動するためにKubernetes CLI kubectlを使用する|許可される|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|ブロックされる（ServiceAccountがオーバープロビジョニングされておらず、Container Drift Enforcementによってkubectlのインストールが妨げられているため）|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|ブロックされる。|
+|9*|security-playgroundポッドからノードのAWS EC2 Instance Metadataエンドポイントに対してcurlコマンドを実行する。|許可される|許可される|許可される|許可される|
+|10|xmrig暗号マイナーの実行|許可される|許可される|ブロック（xmrigのインストールをブロックするContainer Drift Enforcementによる）|ブロック（Malware Enforcementによる）|
+
 *そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックできる可能性があります。これはこの後のNetworkPolicyのラボで実施します。
 
 ## モジュール 2 - ランタイム脅威の検知と防御（クラウド/AWS）
