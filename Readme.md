@@ -218,10 +218,10 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 
 この表は、このワークロードを修正するためのテストをまとめたものです：
 
-|example-curl.shでの悪用|example-curl|security-playground|security-playground-restricted|security-playground-restricted + container driftのブロック|security-playground-restricted + マルウェアのブロック|
+|example-curl.shでの悪用|example-curl|security-playground|security-playground-restricted|security-playground-restricted + container driftブロック|security-playground-restricted + マルウェアブロック|
 |-|-|-|-|-|-|
 |1|機密パス/etc/shadowの読み込み|許可される|ブロックされる（rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|
-|2|ファイルを/binに書き込み、それを`chmod +x'して実行する|許可される|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|
+|2|ファイルを/binに書き込み、それを`chmod +x`して実行する|許可される|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|
 |3|aptからnmapをインストールしてネットワークスキャンを実行する|許可される|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|ブロックされる(rootとして実行されないことで)|
 |4|nsenterコマンドを実行し、コンテナLinuxの名前空間からホストにエスケープする|許可される|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|
 |5|ノードのコンテナランタイムに対して crictlコマンドを実行する|許可される|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|
@@ -229,7 +229,7 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
 |7|機密データを流出させるために同じノード上の別のPod内で Postgres CLIのpsqlを実行するためにcrictl コマンドを使用する|許可される|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|ブロックされる（rootとして実行されておらず、hostPIDと特権的なsecurityContextを持たない）|
 |8|別の極悪なワークロードを起動するためにKubernetes CLIのkubectlを使用する|許可される|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|ブロックされる（ServiceAccountがオーバープロビジョニングされておらず、Container Drift強制によってkubectlのインストールが妨げられているため）|ブロックされる（ServiceAccountがオーバープロビジョニングされていないため）|
 |9*|security-playgroundポッドからノードのAWS EC2 Instance Metadataエンドポイントに対してcurlコマンドを実行する|許可される|許可される|許可される|許可される|
-|10|xmrigクリプトマイナーの実行|許可される|許可される|ブロックされる（xmrigのインストールをブロックするContainer Drift強制による）|ブロック（Malware強制による）|
+|10|xmrigクリプトマイナーの実行|許可される|許可される|ブロックされる（xmrigのインストールを防止するContainer Driftブロックによる）|ブロック（Malwareブロックによる）|
 
 *そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックできる可能性があります。これはこの後のNetworkPolicyのラボで実施します。
 
