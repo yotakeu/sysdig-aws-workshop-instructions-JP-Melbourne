@@ -449,7 +449,7 @@ Sysdigはすべてのネットワークフローを追跡し、関係するす�
 1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストします。
 1. Escを押して挿入モードを終了し、`:wq`と入力して保存して終了します。
 1. 適用するには、`kubectl apply -f policy2.yaml`と入力します。
-1. `./example-curls.sh`を再実行し、このNetworkPolicyでブロックされた内容がどの程度発生したかをメモします。
+1. `./example-curls.sh`を再実行し、このNetworkPolicyでブロックされた攻撃が何かを確認します。
     1. もし、コンテナからホストに移動すると、NetworkPolicyは適用されなくなります（ただし、Nodeをカバーするファイアウォール/SecurityGroupは適用されます）。
         1. これが、コンテナのエスケープを防ぐ必要があるもう1つの大きな理由です！
 
