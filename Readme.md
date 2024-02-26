@@ -242,7 +242,7 @@ EKSとAWS環境の両方をカバーすることがなぜ重要なのか、AWS�
 ### AWS IAM Roles for Service Accounts (IRSA)
 AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) と呼ばれる、PodにAWS APIへのアクセス権を与える仕組みがあります。要するに、これはKubernetesの特定のサービスアカウントをAWSのIAMロールにバインドするもので、実行時にKubernetesサービスアカウントを利用するPodに、AWS IAMロールを利用するための認証情報を自動的にマウントします。
 
-**security-playground**ネームスペースの**irsa**サービスアカウントは、**Action": "s3:*"** ポリシーが適用されています。以下のコマンドを実行すると、そのIAM RoleのARNを持つサービスアカウントのAnnotationが表示されます：
+**security-playground**ネームスペースの**irsa**サービスアカウントには、**Action": "s3:*"** ポリシーが適用されています。以下のコマンドを実行すると、**irsa**サービスアカウントのAnnotationが表示され、バインドされたAWS IAMロールのARNを確認できます：
 
 `kubectl get serviceaccount irsa -n security-playground -o yaml`
 
