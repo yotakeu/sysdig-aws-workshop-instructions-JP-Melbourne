@@ -399,7 +399,7 @@ Sysdigはすべてのネットワークフローを追跡し、関係するす�
 1. `./example-curls-networkpolicy.sh`を実行して、security-playground Podがhello-server（別のネームスペースで実行中）にどのように到達できるかを確認してください。
 1. ブラウザでSysdig UIを開きます。
 1. 左側の**Network**に移動します。
-1. EKSクラスタ、ネームスペースとして**hello**、タイプとして**Service**を選択します。
+1. クラスタとして自身のEKSクラスタ、ネームスペースとして**hello**、タイプとして**Service**を選択します。
     1. ![](instruction-images/network1.png)
 1. 右側のペインでは、helloネームスペースが以下のように構成されていることがわかります：
     1. バックエンドは、hello-server という名前のサービスと hello-server という名前のデプロイメントで構成されています。
