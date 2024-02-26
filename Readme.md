@@ -246,7 +246,7 @@ AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.
 
 `kubectl get serviceaccount irsa -n security-playground -o yaml`
 
-次のようなインラインポリシーがあります。よく見かける、s3サービス用のものです（実際には、バケット自体だけでなくコンテンツもカバーするために2つあります）。これは、単一のバケットResourceに適切にスコープされており、ないよりはましですが、なぜこのサービスのための "*" が悪い考えなのかがわかるでしょう。
+IAM RoleのARNから辿ることで確認できますが、このIAM Roleは次のようなインラインポリシーを持ちます。よく見かける、s3サービス用のものです（実際には、バケット自体だけでなくコンテンツもカバーするために2つあります）。これは、単一のバケットResourceに適切にスコープされており、ないよりはましですが、なぜこのサービスのための "*" が悪い考えなのかがわかるでしょう。
 
 ```
 {
@@ -266,7 +266,7 @@ AWS EKSには、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.
 }
 ```
 
-次に信頼関係を見てみましょう。このロールは、AWS IAMと統合するために固有のOIDCプロバイダを割り当てられたEKSクラスタ内の、 **security-playground**ネームスペース内の **irsa**サービスアカウントによってのみ引き受けられることがわかります。
+信頼関係という点では、このロールは、AWS IAMと統合するために固有のOIDCプロバイダを割り当てられたEKSクラスタ内の、 **security-playground**ネームスペース内の **irsa**サービスアカウントによってのみ引き受けられます。
 
 ```
 {
