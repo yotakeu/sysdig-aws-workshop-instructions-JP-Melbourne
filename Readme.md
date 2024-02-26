@@ -376,8 +376,6 @@ Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソ�
         1. Container permitting root
     1. 4.2.1 Minimize the admission of privileged containers
         1. Container running as privileged
-    1. 4.1.5 Ensure that the default service accounts are not actively used
-        1. Access granted to "default" account directly
     1. ![](instruction-images/posture2.png)
     1. ![](instruction-images/posture3.png)
 
