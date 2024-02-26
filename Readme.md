@@ -351,7 +351,7 @@ Sysdig のランタイム脆弱性スキャンを確認するには、以下の�
 
 `./sysdig-cli-scanner -a app.au1.sysdig.com logstash:7.16.1`
 
-パイプライン・ステージのビルド・ログに出力されるだけでなく、出力に記載されているリンクをたどるか、UIの**Vulnerabilities** -> **Pipeline**に進むことで、Sysdig SaaSのUIで結果を調べることもできます。この結果にはランタイムコンテキストが欠落していることに注意してください（パイプラインでスキャンされたため、ランタイムコンテキストをまだ知らないため）。
+パイプライン・ステージのビルド・ログに出力されるだけでなく、出力に記載されているリンクをたどるか、UIの**Vulnerabilities** -> **Pipeline**に進むことで、Sysdig SaaSのUIで結果を調べることもできます。この結果にはIn Useなどのランタイムコンテキストが欠落していることに注意してください（パイプラインでスキャンされたため、ランタイムコンテキストをまだ知らないため）。
 
 また、[レジストリ内のイメージをスキャンする機能](https://docs.sysdig.com/en/docs/installation/sysdig-secure/install-registry-scanner/) もありますが、このワークショップでは触れません。
 
