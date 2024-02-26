@@ -364,7 +364,7 @@ Sysdigは、CIS、NIST、SOC 2、PCI DSS、ISO 27001など、多くの一般的�
 Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソースのセキュリティベンチマークを公開しています。詳しくは[こちらのサイト](https://www.cisecurity.org/benchmark/kubernetes)をご参照ください。
 このモジュールでは、クラスタとそのワークロードがこの標準に準拠しているかどうかを調べます。
 
-1. ブラウザのSysdigタブを開きます。
+1. SysdigのUIを開きます。
 1. **Posture**に移動し、次に**Compliance**に移動します。
 1. [Team and Zone-based authorization](https://docs.sysdig.com/en/docs/sysdig-secure/policies/zones/)を使用して、チームが自分のクラスタ/ゾーンのみを参照できるように設定してあります。
 1. **CIS Amazon Elastic Kubernetes Service Benchmark**をクリックします（これはあなたのZoneに対して設定した唯一のコンプライアンス標準ですが、NIST、SOC2、PCIDSSなど他にも多くのコンプライアンス標準があります）。
