@@ -172,7 +172,7 @@ SysdigエージェントはどのLinuxマシンにもインストールするこ
     1. Kubernetesに組み込まれた[Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/)機能(1.25でGAになった)で、PodSpecに入れられないように強制することができます。
         1. これは[各Namespaceにラベルを追加する](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)ことで機能します。baselineとrestrictedの2つの基準を使って、警告したり強制したりすることができます。
             1. [baseline](https://kubernetes.io/docs/concepts/security/pod-security-standards/#baseline) - HostPidやPrivilegedなど、PodSpecの最悪のパラメータは使用できませんが、コンテナをrootとして実行することはできます。
-            1. [restricted](https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted) - 非rootでの実行を含む、すべての安全でないオプションをブロックします。
+            1. [restricted](https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted) - rootでの実行を含む、すべての安全でないオプションをブロックします。
     1. また、Sysdig には Posture/Compliance 機能があり、デプロイ前に IaC をスキャンしたり、実行時に問題を修正したりすることができます。
 1. ドリフト・コントロール（Drift Control）機能で、実行時に追加される新しいスクリプト/バイナリの実行をブロックすることができます（今回はドリフトを防止するのではなく、検知するだけです）。
 1. KubernetesのNetworkPolicy（今後のモジュールで取り上げます）か、各サービスが到達可能な宛先の許可リストを使用して、インターネットに到達するために明示的に認証されたプロキシを経由させることによって、インターネットへのPod（複数可）のEgressアクセスを制限することができます。
