@@ -292,7 +292,7 @@ IAM RoleのARNから辿ることで確認できますが、このIAM Roleは次�
 ### Exploit
 実行時にAWS CLIをコンテナにインストールし、いくつかのコマンドを実行すると、PodにIRSAロールが割り当てられているかどうかがわかります。/rootに**example-curls-bucket-public.sh**ファイルがあるので、`cat example-curls-bucket-public.sh`で内容を確認して、`./example-curls-bucket-public.sh`を実行します。
 
-AWS CLIのインストールは成功しましたが、S3の変更はアクセス権がないので失敗します。S3コンソールでこのバケットを見ると、Block public accessが有効のままになっているはずです。security-playground Deploymentのマニフェストを更新し、これまで使用していた**default**のサービスアカウントではなく、この**irsa**サービスアカウントを使用するようにしましょう。この変更を適用するには、`kubectl apply -f security-playground-irsa.yaml`を実行します。ここで、`./example-curls-bucket-public.sh`を再実行すると、今度はうまくいきます！
+AWS CLIのインストールは成功しましたが、S3の変更はアクセス権がないので失敗します。S3コンソールでこのバケットを見ると、パブリックになっていません。security-playground Deploymentのマニフェストを更新し、これまで使用していた**default**のサービスアカウントではなく、この**irsa**サービスアカウントを使用するようにしましょう。この変更を適用するには、`kubectl apply -f security-playground-irsa.yaml`を実行します。ここで、`./example-curls-bucket-public.sh`を再実行すると、今度はうまくいきます！
 
 S3コンソールでこのバケットを見ると、今度はバケット（とそのすべてのコンテンツ）がパブリックになっていることがわかるでしょう（そして、攻撃者はS3のパブリックAPIからすぐにダウンロードすることができます）！
 ![](instruction-images/bucketpublic.png)
