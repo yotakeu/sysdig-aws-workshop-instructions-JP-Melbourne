@@ -131,7 +131,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 この攻撃が成功するためには、多くの条件が当てはまらなければなりません：
 1. 私たちのサービスがリモートでコードを実行される脆弱性があること。これは、私たち自身のコードが脆弱であること（今回のケースのように）、あるいは私たちのアプリが使用しているオープンソースパッケージ（pip、npm、maven、nugetなど）が脆弱であることのいずれかによる可能性があります。
 1. 私たちが **curl** でアクセスしていたサービスは、**root** として実行されていました - そのため、コンテナのファイルシステム内のすべてを読み書きできるだけでなく、コンテナからホストにエスケープするときも root でした！
-1. PodSpecは[**hostPID: true**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L47)と[privrivileged **securityContext**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L64)を持っていたため、コンテナ境界(実行中のLinuxネームスペース)からホストにエスケープすることができました。
+1. PodSpecは[**hostPID: true**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/3da34f8429bd26b82a3ee2f052d2b654d308990f/k8s-manifests/04-security-playground-deployment.yaml#L18)と[privrivileged **securityContext**](https://github.com/jasonumiker-sysdig/example-scenarios/blob/3da34f8429bd26b82a3ee2f052d2b654d308990f/k8s-manifests/04-security-playground-deployment.yaml#L35)を持っていたため、コンテナ境界(実行中のLinuxネームスペース)からホストにエスケープすることができました。
 1. 攻撃者は、実行時に**nmap**や暗号マイナーの**xmrig**のような新しい実行可能ファイルをコンテナに追加して実行することができました。
 1. 攻撃者はインターネットからこれらのものをダウンロードすることができました（このPodはそのEgressを介してインターネット上のあらゆる場所に到達することができたため）。
 1. 私たちのサービスの ServiceAccount は過剰にプロビジョニングされており、K8s API を呼び出して他のワークロードを起動することができました（本来これは必要ありません）。
@@ -180,7 +180,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 ### 実際に修正する
 私たちは、**この攻撃はなぜ成功したのでしょうか?** の1から3が修正されたワークロードの例として **security-playground-restricted** も実行しています。このワークロードは新しいnon-root Dockerfileで構築され、PSAがrestrictedのセキュリティ標準を強制するsecurity-playground-restrictedネームスペースで実行されています（つまり、rootとして実行したり、コンテナのエスケープを可能にするhostPIDや特権SecurityContextなどのオプションを持つことはできません）。`kubectl describe namespace security-playground-restricted` コマンドを実行してPSAを実現するラベルを確認しましょう（**pod-security**ラベルに注目してください）。
 
-オリジナルのKubernetes PodSpec [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground.yaml#L46) と、restrictedのPSAをパスするために必要なすべての変更を加えたアップデート版 [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/security-playground-restricted.yaml#L26) を確認することができます。
+オリジナルのKubernetes PodSpec [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/k8s-manifests/04-security-playground-deployment.yaml) と、restrictedのPSAをパスするために必要なすべての変更を加えたアップデート版 [こちら](https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/k8s-manifests/07-security-playground-restricted-deployment.yaml) を確認することができます。
 
 1から3が修正された状態で、私たちの攻撃がどうなるかを確認するには、`./example-curls-restricted.sh`を実行してください（前回とは異なるsecurity-playground-restrictedのポート/サービスを宛先とするだけで、内容は前回のファイルと同じです）。以下の点に注目してください：
 * コンテナ内でroot権限を必要とするもの（/etc/shadowの読み込み、/binへの書き込み、aptからのパッケージのインストールなど）は、Pythonアプリがそれを実行する権限を持っていないため、**500 Internal Server Error** で失敗します。
