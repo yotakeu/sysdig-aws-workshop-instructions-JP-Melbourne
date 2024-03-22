@@ -173,7 +173,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
             1. [restricted](https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted) - rootでの実行を含む、すべての安全でないオプションをブロックします。
     1. また、Sysdig には Posture/Compliance 機能があり、デプロイ前に IaC をスキャンしたり、実行時に問題を修正したりすることができます。
 1. ドリフト・コントロール（Drift Control）機能で、実行時に追加される新しいスクリプト/バイナリの実行をブロックすることができます（今回はドリフトを防止するのではなく、検知するだけです）。
-1. KubernetesのNetworkPolicy（今後のモジュールで取り上げます）か、各サービスが到達可能な宛先の許可リストを使用して、インターネットに到達するために明示的に認証されたプロキシを経由させることによって、インターネットへのPod（複数可）のEgressアクセスを制限することができます。
+1. KubernetesのNetworkPolicyか、各サービスが到達可能な宛先の許可リストを使用して、インターネットに到達するために明示的に認証されたプロキシを経由させることによって、インターネットへのPod（複数可）のEgressアクセスを制限することができます。
 1. Kubernetes APIへの不要なアクセスを許可するデフォルトのServiceAccountによる、Kubernetes APIへのRoleとRoleBindingを削除することができます。
 1. 上記のようにNetworkPolicyでPodの169.254.0.0/16へのEgressアクセスをブロックするか、AWSのドキュメントに記載されているようにIDMSv2で最大1ホップに制限するか、どちらかです - https://docs.aws.amazon.com/whitepapers/latest/security-practices-multi-tenant-saas-applications-eks/restrict-the-use-of-host-networking-and-block-access-to-instance-metadata-service.html
 
@@ -187,7 +187,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 * **root**と**hostPid**と**privileged**がないので、コンテナをエスケープできませんでした。
 * 唯一うまくいったのは、ノードのEC2メタデータエンドポイントを叩くことと、xmrig crypto minerをユーザーのホームディレクトリにダウンロード/実行することでした。
 
-また、SysdigでContainer Driftの防止（コンテナ稼働時に追加された新しい実行可能ファイルを実行できないようにする）を有効にすると、EC2インスタンスのメタデータへのアクセス（この後のラボでNetworkPoliciesでブロックする）以外はすべてブロックされます。この設定を確認するには：
+また、SysdigでContainer Driftの防止（コンテナ稼働時に追加された新しい実行可能ファイルを実行できないようにする）を有効にすると、EC2インスタンスのメタデータへのアクセス以外はすべてブロックされます。この設定を確認するには：
 * **Policies -> Runtime Policies** に移動し、**security-playground-restricted-nodrift**ポリシーを確認します。他のネームスペースのようにドリフトを検知するだけではなく、ワークロードが**security-playground-restricted-nodrift**ネームスペースにある場合には**ブロック**することに注目してください。
 * `./example-curls-restricted-nodrift.sh` を実行します。同じcurlを実行しますが、直前の例のように制限されているワークロードに対して実行し、かつContainer Driftの防止（検知だけでなく）が有効になっています。
     1. Sysdig UI の Insights で結果のイベントを見ると、今回は Drift が検知されただけでなく、**防止**されたことがわかります。
@@ -229,7 +229,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 |9*|security-playgroundポッドからノードのAWS EC2 Instance Metadataエンドポイントに対してcurlコマンドを実行する|許可される|許可される|許可される|許可される|
 |10|xmrigクリプトマイナーの実行|許可される|許可される|ブロックされる（xmrigの起動を防止するContainer Driftブロックによる）|ブロックされる（xmrigの起動を防止するMalwareブロックによる）|
 
-*そして9は、NetworkPolicyやIDMSv2の1ホップへの制限によってブロックできる可能性があります。これはこの後のNetworkPolicyのラボで実施します。
+*そして9は、IDMSv2の1ホップへの制限によってブロックできる可能性があります。
 
 ## モジュール 2 - ランタイム脅威の検知と防御（クラウド/AWS）
 
@@ -380,78 +380,6 @@ Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソ�
 もし、**security-playground**のこれらの設定がCISのEKS Benchmarkをパスするように設定されていたら、先ほどテストした **security-playground-unprivileged**ワークロードと同じようになります。
 
 また、このツールは、ワークロードやクラスタに関するセキュリティ上の問題を修正するのに役立つだけでなく、監査人に対して、遵守すべき標準に準拠していることを証明するのにも役立ちます。
-
-## モジュール 5 - Kubernetes ネイティブ　ファイアウォール (NetworkPolicies)
-
-Kubernetesには組み込みのファイアウォールがあり、[NetworkPolices](https://kubernetes.io/docs/concepts/services-networking/network-policies/)と呼ばれるYAMLドキュメントを通して設定します。これらはIPやCIDRブロック/レンジだけでなく、Kubernetesのネームスペースやラベルに基づいたルールを持つことができます。これはよりダイナミックで管理しやすくなります！
-
-EKSを含む多くのKubernetesディストリビューションでは、すぐに有効にはなりません。EKSの場合、NetworkPolicy Providerを選択する必要があります。一般的なものは[Calico](https://www.tigera.io/project-calico/)と[Cilium](https://cilium.io/)です。AWSは[Calicoをインストールするためのドキュメント](https://docs.aws.amazon.com/eks/latest/userguide/calico.html)を提供しています。Calicoは今回のクラスタにプリインストールされています。これらのプロバイダは基本的に、各Kubernetes Nodeにローカルファイアウォールを設定し、必要に応じてNetworkPoliciesを適用するためにすべてのNodeでそれらを更新します。
-
-プロバイダをインストールした後でも、デフォルトではすべてのPodが他のすべてのPodと通信できます。そのため、そのトラフィックを制限するためのポリシーを実装する必要があります。最も安全なオプションは、デフォルトで拒否し、必要なものすべてを特別に許可することです。既存の環境にポリシーを追加するのは少し大変かもしれません。そこでSysdigが役に立ちます。
-
-### Sysdigを使用してトラフィックを検出し、NetworkPoliciesを生成する
-
-Sysdigはすべてのネットワークフローを追跡し、関係するすべてのKubernetesコンテキスト/ラベルを計算します。これにより、トラフィックを表示し、特定のトラフィックのみを許可するNetworkPoliciesを生成することができます。私たちのUIでは、トラフィックを許可したくない場合、対象のトラフィックのチェックを外すことができます。
-
-この機能を利用するには
-1. `./example-curls-networkpolicy.sh`を実行して、security-playground Podがhello-server（別のネームスペースで実行中）にどのように到達できるかを確認してください。
-1. ブラウザでSysdig UIを開きます。
-1. 左側の**Network**に移動します。
-1. クラスタとして自身のEKSクラスタ、ネームスペースとして**hello**、タイプとして**Service**を選択します。
-    1. ![](instruction-images/network1.png)
-1. 右側のペインでは、helloネームスペースが以下のように構成されていることがわかります：
-    1. バックエンドは、hello-server という名前のサービスと hello-server という名前のデプロイメントで構成されています。
-    1. hello-clientとhello-client-blockedという2つのフロントエンドアプリが、hello-serverバックエンドサービスと通信します。
-    1. また、security-playground サービスもバックエンドに接続していることがわかります（実行したエクスプロイトスクリプトには、接続するための **curl**がありました）。
-    1. ![](instruction-images/network2.png)
-1. **Ingress**タブをクリックします。
-1. ここで、hello-serverサービスと通信したくないもののチェックを外すことができます。
-    1. **hello-client**以外のすべてのチェックを外します。
-    1. ![](instruction-images/network3.png)
-1. **Topology**に戻ると、ブロックするトラフィックが赤い線で表示されます（hello-clientからのパスだけが許可されています）。
-    1. ![](instruction-images/network4.png)
-1. **Generated Policy**タブをクリックし、すべての内容をクリップボードにコピーします。
-    1.![](instruction-images/network5.png)
-1. ジャンプボックス端末のブラウザタブに戻ります。
-1. `vi policy.yaml`を実行します。
-1. `i`と入力して挿入モードに入ります。
-1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストします。
-1. Escを押して挿入モードを終了し、`:wq`と入力して保存して終了します。
-1. 適用するには、`kubectl apply -f policy.yaml`と入力します。
-1. `./example-curls-networkpolicy.sh`を再度実行し、新しいNetworkPolicyによりhello-serverに到達できないことを確認します（タイムアウトします）。
-1. `kubectl logs deployment/hello-client-blocked -n hello`を実行し、hello-client-blockedサービスのログを確認します。
-1. `kubectl logs deployment/hello-client -n hello`を実行すると、hello-clientサービスのログが表示されます。
-
-#### ネットワークのEgressの制御 - 特にインターネットへのEgressの制御
-
-これは、先ほどhello-serverでやったように、サービスへの入口を制御するだけでなく、 特にインターネットへの出口を制限するのにも便利です。
-
-先ほどの安全でないsecurity-playgroundの例で、これがどのように役立つかを見てみましょう：
-1. Sysdig UIのタブに戻ります。
-1. **Network** セクションで、**security-playground**ネームスペースと **Deployment**オブジェクトタイプを選択します。
-    1. ![](instruction-images/network6.png)
-1. ここでは、hello-serverとの通信だけでなく、aptパッケージをダウンロードしたり、クリプトマイナープールと会話するために、curlを実行するときに呼び出されたすべてのインターネットIPも表示されます。
-1. 上記で行ったように、すべてのインターネットEgressを除外したNetworkPolicyを生成できます。**Egress**タブに移動します。
-    1. クラスタ外のすべてのIP/CIDRを除外するように、あらかじめデフォルト設定されています（線が赤くなっているのはそのためですが、NetworkPolicyを**kubectl apply**で適用するまでは、実際に通信はブロックされません）：
-        1. hello-serverのチェックを外し、security-playgroundがhello-serverにEgressできないようにします。
-            1. もしこれらを再び許可したければ、各対象の右側にあるプラスアイコンのチェックマークをクリックすることができます。
-    1. ![](instruction-images/network7.png)
-    1. これは、最初にcurlで実施した攻撃の多くを防ぐ、もう一つの方法です！
-1. **Generated Policy**タブを開きます
-    1. 生成されたポリシーをそのまま使うのではなく、policyTypesからIngressの行を削除して、security-playgroundサービスには到達できるようにします。
-        1. これをコピーしてテキストエディタに貼り付け、Ingressの行を削除してから、Ingressのないポリシーをクリップボードにコピーします。
-    1. ![](instruction-images/network8.png)
-1. ジャンプボックス端末のブラウザタブに戻ります。
-1. `vi policy2.yaml`を実行します。
-1. `i`と入力して挿入モードに入ります。
-1. PCの場合は**Shift-Ctrl-V**、Macの場合は**Shift-Command-V**でペーストします。
-1. Escを押して挿入モードを終了し、`:wq`と入力して保存して終了します。
-1. 適用するには、`kubectl apply -f policy2.yaml`と入力します。
-1. `./example-curls.sh`を再実行し、このNetworkPolicyでブロックされた攻撃が何かを確認します。
-    1. もし、コンテナからホストに移動すると、NetworkPolicyは適用されなくなります（ただし、Nodeをカバーするファイアウォール/SecurityGroupは適用されます）。
-        1. これが、コンテナのエスケープを防ぐ必要があるもう1つの大きな理由です！
-
-NetworkPoliciesの構文についてもっと知りたい場合は、よく使われるパターンの例を集めた素晴らしいリソースがGitHubにあります - https://github.com/ahmetb/kubernetes-network-policy-recipes.
 
 ## 結論
 
