@@ -381,6 +381,30 @@ Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソ�
 
 また、このツールは、ワークロードやクラスタに関するセキュリティ上の問題を修正するのに役立つだけでなく、監査人に対して、遵守すべき標準に準拠していることを証明するのにも役立ちます。
 
+## モジュール5 - Risksとアタックパス
+
+これまで、これらの各機能 (ランタイム脅威検知、脆弱性管理、およびポスチャ管理) をそれぞれの UI で個別に検討してきました。しかし、Sysdig は包括的なクラウド ネイティブ アプリケーション保護プラットフォーム (CNAPP) です。つまり、これらすべての機能とすべてのデータを1つにまとめて、完全なコンテキストをエンドツーエンドで視覚化し、優先順位を付けるのに役立ちます。
+
+製品内でそれを行うのはRisksです。
+
+左側の [Risks] に移動すると、以下が表示されます。
+![](instruction-images/risks1.png)
+インジケーターを展開すると、詳細が表示されます。Liveアイコンが表示されているという事実は、これがアクティブなリスクであることを示しています (安全でない構成や重大な脆弱性があるだけでなく、これらが悪用されている可能性がある最近の重大なイベントも確認されています)。これには以下のすべてのカテゴリが含まれていることがわかります。
+* 公開されている (この場合はKubernetesクラスターの外部に対して)
+* 重大な脆弱性がある
+* 安全でない構成が含まれている
+* 危険な行為がすでに検知されているイベントがある
+
+クリックするとさらに深く掘り下げることができます。ここでは、アタックパスの視覚化の小さい画像を表示しています。右上の [Explore] をクリックして、より大きな画像を見てみましょう
+![](instruction-images/risks2.png). 
+
+Here you can see all of the data Sysdig has about the security-playground workload but all brought together in one visualisation. And that, while any of these things are bad, the fact that this workload has all of them makes it a Critical Risk to prioritise.
+ここでは、Sysdigがsecurity-playgroundワークロードに関して保持しているすべてのデータを1つに視覚化してまとめて確認できます。そして、これらのいずれも危険な項目ではありますが、このワークロードにはそれらがすべて含まれているという事実により、優先すべきCriticalなリスクになります。
+
+より大きなアタックパスの視覚化が表示されたら、アイコンのいずれかをクリックし、ドリルダウンしてさらに深く掘り下げることができます。おそらく、このUIから直接解決することができる項目もあるでしょう。
+![](instruction-images/risks3.png)
+![](instruction-images/risks4.png)
+
 ## 結論
 
 以上、SysdigがAWS EKSを含むKubernetes環境のセキュリティ確保を支援するために顧客に提供している多くの機能の一部を、as-a-serviceで簡単にご紹介しました。
