@@ -398,7 +398,6 @@ Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソ�
 クリックするとさらに深く掘り下げることができます。ここでは、アタックパスの視覚化の小さい画像を表示しています。右上の [Explore] をクリックして、より大きな画像を見てみましょう
 ![](instruction-images/risks2.png). 
 
-Here you can see all of the data Sysdig has about the security-playground workload but all brought together in one visualisation. And that, while any of these things are bad, the fact that this workload has all of them makes it a Critical Risk to prioritise.
 ここでは、Sysdigがsecurity-playgroundワークロードに関して保持しているすべてのデータを1つに視覚化してまとめて確認できます。そして、これらのいずれも危険な項目ではありますが、このワークロードにはそれらがすべて含まれているという事実により、優先すべきCriticalなリスクになります。
 
 より大きなアタックパスの視覚化が表示されたら、アイコンのいずれかをクリックし、ドリルダウンしてさらに深く掘り下げることができます。おそらく、このUIから直接解決することができる項目もあるでしょう。
