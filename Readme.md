@@ -21,7 +21,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 1. EC2サービスのコンソールに移動します（上部の検索ボックスにEC2と入力し、検索結果のEC2サービスをクリックできます）。
 1. Resourcesの下にある **Instances (running)** リンクをクリックし、実行中のEC2インスタンスのリストに移動します。
     1. ![](instruction-images/instances1.png)
-1. **Find instance by attribute or tag** 検索ボックスに**AttendeeXX**（XXはユーザー名の末尾の出席者番号）と入力し、エンター(リターン）を押します。
+1. **Find instance by attribute or tag** 検索ボックスに**AttendeeXX**（XXはユーザー名の末尾の出席者番号）と入力し、エンター(リターン）を押します。2台のEC2インスタンが表示されますが、Name欄にAttendeeXXJumpboxと記載されているt3.smallのEC2インスタンスがジャンプボックスです。
 1. ジャンプボックスの隣にあるボックスにチェックを入れ、上部の**Connect**ボタンをクリックします。
     1. ![](instruction-images/instances2.png)
 1. **Session Manager**タブを選択し、**Connect**ボタンをクリックします。
