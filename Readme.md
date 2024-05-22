@@ -194,7 +194,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 
 また、マルウェアを検知するだけでなく、ブロックすることもできるようになりました。
 それを確認するには：
-* **Policies > Runtime Policies**に移動し、**security-playground-restricted-nomalware**ポリシーを確認してください。他のNamespaceのように単にマルウェアを検知するだけではなく、ワークロードが**security-playground-restricted-nomalware**ネームスペースにある場合は**ブロック**することに注目してください。
+* **Policies > Runtime Policies**に移動し、**security-playground-restricted-nomalware**ポリシーを確認してください。他のNamespaceのように単にマルウェアを検知するだけではなく、ワークロードが**security-playground-restricted-nomalware**ネームスペースにある場合は**ブロック**（Prevent Malware）することに注目してください。
 * `./example-curls-restricted-nomalware.sh`を実行します。同じcurlを実行しますが、Sysdigがマルウェアを検知するだけでなくマルウェアを防止しています。ただし、Container Driftはブロックしていません。
     1. Sysdig UI の Insights で結果のイベントを見ると、マルウェアが検知されただけでなく、**実行を阻止**されたことがわかります。
     1. ![](instruction-images/malware.png)
@@ -298,9 +298,7 @@ S3コンソールでこのバケットを見ると、今度はバケット（と
 
 ホスト側では、AWSに対して実行されているコマンドを含む多くの**Drift Detections**が表示されます。これはAWS CLIをイメージに含めるべきでないもっともな理由です！![](instruction-images/s3drift.png)
 
-AWS API側では下記イベントで、バケットが公開されることに対する保護が削除されただけでなく、新しいBucket Policy(バケットを公開する)が適用されたことも確認できます。
-> **注**： 今回のラボ環境では、Sysdigのユーザー/チームに対してKubernetesクラスタとジャンプボックスだけを表示するようにフィルタリングされているため、残念ながらこれらAWS API側のイベント情報は表示されません。講師は、皆さんに代わってこれらのイベントをお見せすることが可能です。
- 
+**Insights > Cloud Activity**に移動して**Events**タブを表示すると、AWS API側では下記イベントで、バケットが公開されることに対する保護が削除されただけでなく、新しいBucket Policy(バケットを公開する)が適用されたことも確認できます。
 ![](instruction-images/s3cloudevents.png)
 ![](instruction-images/s3cloudevents2.png)
 
