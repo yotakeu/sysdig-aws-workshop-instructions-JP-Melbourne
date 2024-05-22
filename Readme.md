@@ -104,8 +104,6 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
         1. **Suspicious network tool downloaded and launched in container** - 攻撃者がスキャンを実行し、悪用したワークロードがどのネットワークにあるのか、つまり他に何ができるのかを調べようとするのは、一般的な初期段階の行動です。
         1. **The docker client is executed in a container** - これは **docker** CLI だけでなく、**crictl** や **kubectl** といった他のコンテナ CLI の実行を含みます。
             1. コンテナがKubernetesクラスタ上のコンテナランタイム/ソケットと直接会話しようとするのは珍しいことです！
-            1. Processセクションを展開すると、データを流出させた**psql**のような実行されたコマンドが表示されます。
-            1. ![](instruction-images/psql.png)
         1. **Contact EC2 Instance Metadata Service From Container** - EKS Podsは、[IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) などの他の手段を使ってAWSとやり取りする必要があります。その代わりにノードを経由して認証情報を使用するのは疑わしい行動です。
         1. **Malware Detection** - Sysdigは脅威フィードから多くのマルウェアのファイル名とハッシュを探し出します。ここで検知されたクリプトマイナーのxmrigも対象の一つです。
             1. マルウェアの実行をブロックすることもできます！（この後のラボで実際に試します）
@@ -188,7 +186,8 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 * 唯一うまくいったのは、ノードのEC2メタデータエンドポイントを叩くことと、xmrig crypto minerをユーザーのホームディレクトリにダウンロード/実行することでした。
 
 また、SysdigでContainer Driftの防止（コンテナ稼働時に追加された新しい実行可能ファイルを実行できないようにする）を有効にすると、EC2インスタンスのメタデータへのアクセス以外はすべてブロックされます。この設定を確認するには：
-* **Policies -> Runtime Policies** に移動し、**security-playground-restricted-nodrift**ポリシーを確認します。他のネームスペースのようにドリフトを検知するだけではなく、ワークロードが**security-playground-restricted-nodrift**ネームスペースにある場合には**ブロック**することに注目してください。
+* **Policies -> Runtime Policies** に移動し、**security-playground-restricted-nodrift**ポリシーを確認します。他のネームスペースのようにドリフトを検知するだけではなく、ワークロードが**security-playground-restricted-nodrift**ネームスペースにある場合には**ブロック**（Prevent Drift）することに注目してください。
+* ![](instruction-images/drift_prevent_policy.png)
 * `./example-curls-restricted-nodrift.sh` を実行します。同じcurlを実行しますが、直前の例のように制限されているワークロードに対して実行し、かつContainer Driftの防止（検知だけでなく）が有効になっています。
     1. Sysdig UI の Insights で結果のイベントを見ると、今回は Drift が検知されただけでなく、**防止**されたことがわかります。
     1. ![](instruction-images/driftprevented.png)
