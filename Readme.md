@@ -59,7 +59,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 
 ### Sysdig 内でイベントを生成するための攻撃のシミュレーション
 
-1. Sysdig UI で左側の **Insights** をクリックします。
+1. Sysdig UI で左側の **Insights > Kubernetes Activity** をクリックします。
     1. すでにいくつかのイベントが検知されているかもしれません。何も疑わしいアクティビティを検知していない場合は、**Welcome to Insights** プレースホルダ画面が表示されます。
 1. それでは、イベントを生成してみましょう！
     1. 次のリンクをクリックして、クラスタ上のsecurity-playgroundサービスの、安全ではないコードを開いて中身を確認してください - https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/app.py
