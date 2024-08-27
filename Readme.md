@@ -61,7 +61,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 
 ### Sysdig 内でイベントを生成するための攻撃のシミュレーション
 
-1. Sysdig UI で左側の **Insights > Kubernetes Activity** をクリックします。
+1. Sysdig UI で左側の **Threats > Activity > Kubernetes** をクリックします。
     1. すでにいくつかのイベントが検知されているかもしれません。何も疑わしいアクティビティを検知していない場合は、**Welcome to Insights** プレースホルダ画面が表示されます。
 1. それでは、イベントを生成してみましょう！
     1. 次のリンクをクリックして、クラスタ上のsecurity-playgroundサービスの、安全ではないコードを開いて中身を確認してください - https://github.com/jasonumiker-sysdig/example-scenarios/blob/main/docker-build-security-playground/app.py
@@ -98,7 +98,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
        1. このビューは、右側にある実行ファイル(xmrig)に関連する他の全てのイベントを表示するだけでなく、apt-get、nmap、nsenterなど、起こっている他の全てのことを表示します。
        1. ![](instruction-images/explore2.png)
 1. イベントを理解する
-    1. **Insights > Kubernetes Activity**画面に戻り、再び**Events**タブを表示します。最も古い/最初のイベントまでスクロールダウンし、それぞれの詳細/コンテキストをすべて明らかにするために、それぞれのイベントをクリックしてください。ここでピックアップしたものは以下の通りです：
+    1. **Threats > Activity > Kubernetes**画面に戻り、再び**Events**タブを表示します。最も古い/最初のイベントまでスクロールダウンし、それぞれの詳細/コンテキストをすべて明らかにするために、それぞれのイベントをクリックしてください。ここでピックアップしたものは以下の通りです：
         1. **Read sensitive file untrusted** - ウェブサービスが行うべきでない **/etc/shadow** ファイルの読み取り。
         1. **Drift Detection** - 元のイメージにはなかった実行ファイルがコンテナに追加され、それが実行された。
             1. 実行時にコンテナに変更を加えるのはベストプラクティスではありません。むしろ、新しいイメージをビルドし、イミュータブル（不変）パターンでサービスを再デプロイすべきです。
@@ -113,7 +113,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 
 これは、サービスの一部としてすぐに利用できるルールのほんの一部です！
 
-(オプション）すべてのマネージドポリシー（左側の **Policies** に移動し、次に **Runtime Policies** に移動します）とルールライブラリ（**Policies** に移動し、**Rules** のメニューを展開して **Rules Library** を選択します）を見てください。各ルールをクリックして、FalcoのYAML記述を確認してください（これは "魔法のブラックボックス "ではないので、独自のルールを書くことができることに注目してください）。
+(オプション）すべてのマネージドポリシー（左側メニューの **Policies > Threat Detection > Runtime Policies** に移動します）とルールライブラリ（**Policies** に移動し、**Rules** のメニューを展開して **Rules Library** を選択します）を見てください。各ルールをクリックして、FalcoのYAML記述を確認してください（これは "魔法のブラックボックス "ではないので、独自のルールを書くことができることに注目してください）。
 
 ### Activity Audit
 上記で確認したことに加えて、Activity Auditでは、実行されたすべての対話型コマンドと、関連するファイルとネットワークのアクティビティもキャプチャします。
@@ -122,7 +122,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 
 Sysdig AgentはどのLinuxマシンにもインストールすることができ（もうすぐWindowsにもインストールできるようになります！）、このラボ環境ではEKSクラスタに加えてジャンプボックスにもインストールされています。つまり、ワークショップでこれまでに実行したすべての対話型コマンドはキャプチャされたことになります！もし誰かがEKSノードにSSHでアクセスしたり、Agentがインストールされている場所でコマンドを実行した場合も、同じようにキャプチャされます。
 
-これを確認するには、左側の**Investigate**セクションに行き、次に**Activity Audit**に行きます。
+これを確認するには、左側メニューの**Threats > Forensics > Activity Audit**に行きます。
 ![](instruction-images/aa.png)
 その後、**cmd**の1つをクリックして詳細を確認してください。
 
@@ -188,7 +188,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 * 唯一うまくいったのは、ノードのEC2メタデータエンドポイントを叩くことと、xmrig crypto minerをユーザーのホームディレクトリにダウンロード/実行することでした。
 
 また、SysdigでContainer Driftの防止（コンテナ稼働時に追加された新しい実行可能ファイルを実行できないようにする）を有効にすると、EC2インスタンスのメタデータへのアクセス以外はすべてブロックされます。この設定を確認するには：
-* **Policies -> Runtime Policies** に移動し、**security-playground-restricted-nodrift**ポリシーを確認します。他のネームスペースのようにドリフトを検知するだけではなく、ワークロードが**security-playground-restricted-nodrift**ネームスペースにある場合には**ブロック**（Prevent Drift）することに注目してください。
+* **Policies > Threat Detection > Runtime Policies** に移動し、**security-playground-restricted-nodrift**ポリシーを確認します。他のネームスペースのようにドリフトを検知するだけではなく、ワークロードが**security-playground-restricted-nodrift**ネームスペースにある場合には**ブロック**（Prevent Drift）することに注目してください。
 * ![](instruction-images/drift_prevent_policy.png)
 * `./example-curls-restricted-nodrift.sh` を実行します。同じcurlを実行しますが、直前の例のように制限されているワークロードに対して実行し、かつContainer Driftの防止（検知だけでなく）が有効になっています。
     1. Sysdig UI の Insights で結果のイベントを見ると、今回は Drift が検知されただけでなく、**防止**されたことがわかります。
@@ -196,7 +196,7 @@ Sysdig AgentはどのLinuxマシンにもインストールすることができ
 
 また、マルウェアを検知するだけでなく、ブロックすることもできるようになりました。
 それを確認するには：
-* **Policies > Runtime Policies**に移動し、**security-playground-restricted-nomalware**ポリシーを確認してください。他のNamespaceのように単にマルウェアを検知するだけではなく、ワークロードが**security-playground-restricted-nomalware**ネームスペースにある場合は**ブロック**（Prevent Malware）することに注目してください。
+* **Policies > Threat Detection > Runtime Policies**に移動し、**security-playground-restricted-nomalware**ポリシーを確認してください。他のNamespaceのように単にマルウェアを検知するだけではなく、ワークロードが**security-playground-restricted-nomalware**ネームスペースにある場合は**ブロック**（Prevent Malware）することに注目してください。
 * `./example-curls-restricted-nomalware.sh`を実行します。同じcurlを実行しますが、Sysdigがマルウェアを検知するだけでなくマルウェアを防止しています。ただし、Container Driftはブロックしていません。
     1. Sysdig UI の Insights で結果のイベントを見ると、マルウェアが検知されただけでなく、**実行を阻止**されたことがわかります。
     1. ![](instruction-images/malware.png)
@@ -300,7 +300,7 @@ S3コンソールでこのバケットを見ると、今度はバケット（と
 
 ホスト側では、AWSに対して実行されているコマンドを含む多くの**Drift Detections**が表示されます。これはAWS CLIをイメージに含めるべきでないもっともな理由です！![](instruction-images/s3drift.png)
 
-**Insights > Cloud Activity**に移動して**Events**タブを表示すると、AWS API側では下記イベントで、バケットが公開されることに対する保護が削除されただけでなく、新しいBucket Policy(バケットを公開する)が適用されたことも確認できます。
+**Threats > Activity > Cloud**に移動して**Events**タブを表示すると、AWS API側では下記イベントで、バケットが公開されることに対する保護が削除されただけでなく、新しいBucket Policy(バケットを公開する)が適用されたことも確認できます。
 ![](instruction-images/s3cloudevents.png)
 ![](instruction-images/s3cloudevents2.png)
 
@@ -320,7 +320,7 @@ Linuxホストやコンテナイメージの脆弱性をスキャンするのに
 
 ### ランタイム脆弱性スキャン
 Sysdig のランタイム脆弱性スキャンを確認するには、以下の手順に従います：
-1. Sysdig ブラウザのタブに移動し、左側の **Vulnerabilities** から **Runtime** に移動します。
+1. Sysdig ブラウザのタブに移動し、左側メニューの **Vulnerabilities > Findings > Runtime** に移動します。
     1. これは、過去15分以内にお客様の環境で実行されたすべてのコンテナと、当社のAgentがインストールされているすべてのホスト/ノードのリストです。
     1. 自動的に重要度順にソートされるため、一番上のコンテナは、（使用中の脆弱性の数と重要度に基づいて）修正すべき最も重要なものです。
     1. ![](instruction-images/vuln1.png)
@@ -333,8 +333,8 @@ Sysdig のランタイム脆弱性スキャンを確認するには、以下の�
 1. CVEの一つをクリックします。この脆弱性が存在する場所、その脆弱性に関する修正または既知の悪用方法など、すべての詳細を確認できます。
     1. ![](instruction-images/vuln4.png)
 1. 脆弱性の詳細ペインを閉じます。
-1. **In Use**フィルタボタンをクリックします。これは、実行された形跡がない（したがって、悪用される可能性がかなり低い）すべての脆弱性を除外します。
-1. **Has fix**ボタンをクリックします。これは、新しいバージョンで修正プログラムが提供されていない脆弱性を除外します。
+1. **In Use**フィルタボタン（照準器のようなアイコン）をクリックします。これは、実行された形跡がない（したがって、悪用される可能性がかなり低い）すべての脆弱性を除外します。
+1. **Has fix**フィルタボタン（レンチのアイコン）をクリックします。これは、新しいバージョンで修正プログラムが提供されていない脆弱性を除外します。
     1. これで残るのは、（イメージの中だけでなく）実際に稼働している脆弱性であり、修正プログラムが存在する脆弱性です。これで、誰かに依頼すべき、より合理的で優先順位の高いパッチ作業がわかります！
     1. ![](instruction-images/vuln5.png)
 
@@ -348,7 +348,7 @@ Sysdig のランタイム脆弱性スキャンを確認するには、以下の�
 
 `./sysdig-cli-scanner -a app.au1.sysdig.com logstash:7.16.1`
 
-パイプライン・ステージのビルド・ログに出力されるだけでなく、出力に記載されているリンクをたどるか、UIの**Vulnerabilities** -> **Pipeline**に進むことで、Sysdig SaaSのUIで結果を調べることもできます。この結果にはIn Useなどのランタイムコンテキストが欠落していることに注意してください（パイプラインでスキャンされたため、ランタイムコンテキストをまだ知らないため）。
+パイプライン・ステージのビルド・ログに出力されるだけでなく、出力に記載されているリンクをたどるか、UIの**Vulnerabilities > Findings > Pipeline**に進むことで、Sysdig SaaSのUIで結果を調べることもできます。この結果にはIn Useなどのランタイムコンテキストが欠落していることに注意してください（パイプラインでスキャンされたため、ランタイムコンテキストをまだ知らないため）。
 
 また、[レジストリ内のイメージをスキャンする機能](https://docs.sysdig.com/en/docs/installation/sysdig-secure/install-registry-scanner/) もありますが、このワークショップでは触れません。
 
@@ -362,7 +362,7 @@ Center for Internet Security (CIS)は、EKSを含む多くの一般的なリソ�
 このモジュールでは、クラスタとそのワークロードがこの標準に準拠しているかどうかを調べます。
 
 1. SysdigのUIを開きます。
-1. **Posture**に移動し、次に**Compliance**に移動します。
+1. **Compliance**に移動し、次に**Overview**に移動します。
 1. [Team and Zone-based authorization](https://docs.sysdig.com/en/docs/sysdig-secure/policies/zones/)を使用して、チームが自分のクラスタ/ゾーンのみを参照できるように設定してあります。
 1. **CIS Amazon Elastic Kubernetes Service Benchmark**をクリックします（これはあなたのZoneに対して設定した唯一のコンプライアンス標準ですが、NIST、SOC2、PCIDSSなど他にも多くのコンプライアンス標準があります）。
     1. ![](instruction-images/posture1.png)
@@ -401,9 +401,9 @@ Invetoryは同じ情報を表示していますが、コンプライアンス標
 
 これまで、これらの各機能 (ランタイム脅威検知、脆弱性管理、およびポスチャ管理) をそれぞれの UI で個別に検討してきました。しかし、Sysdig は包括的なクラウド ネイティブ アプリケーション保護プラットフォーム (CNAPP) です。つまり、これらすべての機能とすべてのデータを1つにまとめて、完全なコンテキストをエンドツーエンドで視覚化し、優先順位を付けるのに役立ちます。
 
-製品内でそれを行うのはRisksです。
+製品内でそれを行うのはRiskです。
 
-左側の [Risks] に移動すると、以下が表示されます。
+左側の [Risk] に移動すると、以下が表示されます。
 ![](instruction-images/risks1.png)
 インジケーターを展開すると、詳細が表示されます。Liveアイコンが表示されているという事実は、これがアクティブなリスクであることを示しています (安全でない構成や重大な脆弱性があるだけでなく、これらが悪用されている可能性がある最近の重大なイベントも確認されています)。これには以下のすべてのカテゴリが含まれていることがわかります。
 * 公開されている (この場合はKubernetesクラスターの外部に対して)
