@@ -18,7 +18,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 1. プロンプトが表示されたら、AWS Account IDに **sysdig-sales-engineering** と入力されていることを確認します。
 1. 提供された IAM ユーザー名とパスワードを入力し、**Sign in** ボタンをクリックします。
     1. ![](instruction-images/awslogin.png)
-1. コンソール右上のドロップダウンから **Sydney** リージョンを選択します。
+1. コンソール右上のドロップダウンから **Melbourne** リージョンを選択します。
     1. ![](instruction-images/region.png)
 1. EC2サービスのコンソールに移動します（上部の検索ボックスにEC2と入力し、検索結果のEC2サービスをクリックできます）。
 1. Resourcesの下にある **Instances (running)** リンクをクリックし、実行中のEC2インスタンスのリストに移動します。
