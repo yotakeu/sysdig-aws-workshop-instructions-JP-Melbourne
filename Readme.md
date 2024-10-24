@@ -55,7 +55,7 @@ Sysdigのハンズオンワークショップへようこそ。このワーク�
 * AWS、Azure、GCPの監査証跡
 
 伝統的な "ルール/ポリシー "ベースのアプローチに加え、脅威検知/防止機能を強化する3つの機能があります：
-* [ドリフト・コントロール](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/drift-control/) - コンテナ・イメージに含まれていない実行可能ファイルの実行を検知し、オプションでその実行をブロックすることができます。
+* [ドリフト・コントロール](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/container-drift/) - コンテナ・イメージに含まれていない実行可能ファイルの実行を検知し、オプションでその実行をブロックすることができます。
 * [クリプトマイニングML検知](https://docs.sysdig.com/en/docs/sysdig-secure/policies/threat-detect-policies/manage-policies/machine-learning/) - クリプトマイニングの検知に特化した機械学習モデルを採用しています。
 * マルウェア（プレビュー） - 実行しようとするマルウェア（私たちがウォッチしているいくつかの脅威フィードで定義されている）を検知することができます。
 
